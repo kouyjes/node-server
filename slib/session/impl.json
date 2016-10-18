@@ -1,0 +1,4 @@
+{
+  "file":"./impl/FileSessionProvider",
+  "redis":"./impl/RedisSessionProvider"
+}

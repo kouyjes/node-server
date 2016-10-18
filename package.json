@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "x3 web server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "magneto",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "clone": "^1.0.2",
+    "log4js": "^0.6.36",
+    "mime": "^1.3.4",
+    "node-cache": "^3.2.1",
+    "node-uuid": "^1.4.7",
+    "promise": "^7.1.1",
+    "redis": "^2.6.0-2"
+  }
+}

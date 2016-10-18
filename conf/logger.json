@@ -1,0 +1,13 @@
+{
+  "appenders": [
+    {"type": "console"},
+    {
+      "type": "file",
+      "absolute": true,
+      "filename": "/data/log/node-server.log",
+      "maxLogSize": 204800,
+      "backups": 10,
+      "category": "server-sys"
+    }
+  ]
+}
