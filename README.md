@@ -1,5 +1,5 @@
 # node-server 配置说明
-<pre>
+<code>
 /**
  *
  * @type {{logFilePath: string, multiProcess: boolean, contexts: *[]}}
@@ -46,4 +46,4 @@ const config = {
     }
   ]
 };
-<pre>
+</code>
