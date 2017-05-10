@@ -1,7 +1,7 @@
 const http = require('http');
 function proxy(chain,request,response,config){
     var proxy = config.proxy;
-    var reqUrl = request.pathname;
+    var reqUrl = request.url;
     if(proxy && proxy instanceof Array){
         proxy.some(function (p) {
             if(p.pathRule && p.pathRule.test(reqUrl)){
@@ -10,7 +10,7 @@ function proxy(chain,request,response,config){
             }
         });
     }
-    if(!proxy || !proxy.pathRule || !proxy.server || !proxy.pathRule.test(reqUrl)){
+    if(!proxy || !proxy.pathRule || !proxy.server || !reqUrl.match(proxy.pathRule)){
         chain.next();
         return;
     }
