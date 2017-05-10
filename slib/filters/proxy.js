@@ -20,21 +20,28 @@ function proxy(chain,request,response,config){
         port: proxy.port || config.port,
         path: reqUrl,
         method: request.method,
-        headers: request.headers,
-        timeout: proxy.timeout
+        headers: request.headers
     };
     var proxyRequest = http.request(options, function (res) {
+        proxy.headers && Object.assign(res.headers || {},proxy.headers);
         response.writeHead(res.statusCode,res.headers);
         res.on('data', function (data) {
             response.write(data);
         }).on('end', function () {
             response.end();
-        }).on('timeout', function () {
-            response.sendError(401,'proxy request timeout !');
-        }).on('error', function (e) {
-            response.sendError(500,'proxy request error !' + JSON.stringify(e));
-        })
+        });
+    }).on('error', function (e) {
+        if(response.finished){
+           return;
+        }
+        response.sendError(500,'proxy request error !' + JSON.stringify(e));
     });
+    if(typeof proxy.timeout === 'number'){
+        proxyRequest.setTimeout(proxy.timeout, function () {
+            response.sendError(500,'proxy request timeout! IP:' + options.hostname + ' PORT:' + options.port);
+            proxyRequest.abort();
+        });
+    }
     request.on('data', function (data) {
         proxyRequest.write(data);
     });
