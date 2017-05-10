@@ -133,6 +133,20 @@ function wrapperRequestResponse(chain,request,response,config){
     };
     const urlInfo = URL.parse(request.url);
     request.pathname = urlInfo.pathname;
+    var queryParam = request.queryParam = {};
+    var query = urlInfo.query;
+    query && query.split('&').forEach(function (querySection) {
+        var param = querySection.split('=');
+        if(param.length < 2){
+            return;
+        }
+        var paramObj = queryParam[param[0]];
+        if(paramObj){
+            queryParam[param[0]] = [paramObj].concat(param[1]);
+        }else{
+            queryParam[param[0]] = param[1];
+        }
+    });
 
     chain.next();
 }

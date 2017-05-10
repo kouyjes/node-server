@@ -16,7 +16,8 @@ function ServerContext(context){
                 dataFile:'./session.data'
             }
         }},
-        {name:'attributes',value:{}}
+        {name:'attributes',value:{}},
+        {name:'proxy',value:null}
     ];
     properties.forEach(function (property) {
         var setInvoke = this['set' + property.name.substring(0,1).toUpperCase() + property.name.substring(1)];

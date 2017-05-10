@@ -6,7 +6,7 @@ function execute(chain,request,response,config,requestMapping){
             handler.call(handler,request,response,config);
         }catch (e){
             logger.error(e);
-            response.sendError(500,'server internal error !' + JSON.stringify(e))
+            response.sendError(500,'server internal error !' + JSON.stringify(e));
         }
         return;
     }
