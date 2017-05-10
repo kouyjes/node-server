@@ -32,12 +32,8 @@ function init(config){
     if(typeof port !== 'number' || port <= 0){
         throw new TypeError('server port value is invalid !');
     }
-    if(docBase.length === 0){
-        throw new TypeError('docBase value is empty !');
-    }
 
     const requestMapping = require('./request-mapping')(config);
-    //console.log(requestMapping.mapping.urlMapping);
     const server = http.createServer(function (req,resp) {
         requestListener.apply(this,[req,resp,config,requestMapping]);
     });
