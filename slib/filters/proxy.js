@@ -1,4 +1,5 @@
-const http = require('http');
+const http = require('http'),
+    https = require('https');
 function proxy(chain,request,response){
 
     const config = request.getContextConfig();
@@ -22,9 +23,14 @@ function proxy(chain,request,response){
         port: proxy.port || config.port,
         path: reqUrl,
         method: request.method,
-        headers: request.headers
+        headers: request.headers,
+        key:proxy.key,
+        cert:proxy.cert
     };
-    var proxyRequest = http.request(options, function (res) {
+
+    const proxyClient = config.protocol === 'http' ? http : https;
+
+    var proxyRequest = proxyClient.request(options, function (res) {
         proxy.headers && Object.assign(res.headers || {},proxy.headers);
         response.writeHead(res.statusCode,res.headers);
         res.on('data', function (data) {

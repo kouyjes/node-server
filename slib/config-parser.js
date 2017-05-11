@@ -116,6 +116,15 @@ ServerContext.prototype.setPort = function (port) {
     }
     this.port = port;
 };
+ServerConfig.prototype.setProxy = function (proxy) {
+    if(!proxy){
+        return;
+    }
+    if(!proxy.protocol){
+        proxy.protocol = 'http';
+    }
+    this.proxy = proxy;
+};
 function ServerConfig(config){
     this.contexts = null;
     this.logFilePath = null;
