@@ -137,6 +137,9 @@ function getMime(absPath){
 function wrapperRequestResponse(chain,request,response){
 
     const config = request.getContextConfig();
+    if(!response.setHeader){
+        response.setHeader = function () {};
+    }
     response.setHeader('Server',config.serverName);
     const urlInfo = URL.parse(request.url);
     request.pathname = urlInfo.pathname;

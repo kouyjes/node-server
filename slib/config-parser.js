@@ -1,9 +1,11 @@
 'use strict';
 const logger = require('./server-logger').getLogger();
-var index = 0;
+const fs = require('fs'),path = require('path');
+const config = require(path.dirname(__dirname) + '/conf/config.js').config;
 function ServerContext(context){
     var properties = [
         {name:'serverName',value:'x3 server'},
+        {name:'protocol',value:'http'},
         {name:'zipResponse',value:false},
         {name:'docBase',value:[]},
         {name:'path',value:null},
@@ -154,8 +156,6 @@ ServerConfig.prototype.setContexts = function (contexts) {
     });
     this.contexts = contexts;
 };
-const fs = require('fs'),path = require('path');
-const config = require(path.dirname(__dirname) + '/conf/config.js').config;
 function getServerConfig(){
     return new ServerConfig(config);
 }

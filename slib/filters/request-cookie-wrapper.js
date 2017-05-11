@@ -5,9 +5,9 @@ function requestCookieWrapper(chain,request,response){
     if(!cookieString){
         cookieString = '';
     }
-    var cookieStrs = cookieString.split(';');
+    var cookieStrings = cookieString.split(';');
     const requestCookies = {};
-    cookieStrs.forEach(function (cookieStr) {
+    cookieStrings.forEach(function (cookieStr) {
         const cookie = Cookie.parse(cookieStr);
         requestCookies[cookie.name] = cookie;
     });

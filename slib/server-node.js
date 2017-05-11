@@ -2,6 +2,16 @@
 const logger = require('./server-logger').getLogger();
 const serverProcess = require('./server-process');
 const util = require('./util');
+const assert = require('assert'),clone = require('clone');
+const http = require('http'),
+    https = require('https');
+
+const fs = require('fs');
+
+const initFunctions = {
+    http:initHttp,
+    https:initHttps
+};
 function extractCommand(){
     const comParams = process.argv.slice(1);
     var paramConfig = {
@@ -25,17 +35,43 @@ function extractCommand(){
     });
     return config;
 }
-const assert = require('assert'),clone = require('clone');
-const http = require('http');
 function init(config){
+
     assert(!!config,'config is invalid !');
     const port = config.port;
     if(typeof port !== 'number' || port <= 0){
         throw new TypeError('server port value is invalid !');
     }
 
+    const protocol = config.protocol;
+    initFunctions[protocol].call(this,config);
+
+}
+function initHttp(config){
+
+    const port = config.port;
     const requestMapping = require('./request-mapping')(config);
     const server = http.createServer(function (req,resp) {
+        util.freeze(config);
+        requestListener.apply(this,[req,resp,config,requestMapping]);
+    });
+    server.listen(port);
+}
+function initHttps(config){
+
+    const port = config.port;
+    const requestMapping = require('./request-mapping')(config);
+    if(fs.existsSync(config.key)){
+        throw new TypeError('key file is not exist ! ' + config.key);
+    }
+    if(fs.existsSync(config.cert)){
+        throw new TypeError('cert file is not exist ! ' + config.cert);
+    }
+    const option = {
+        key:fs.readFileSync(config.key),
+        cert:fs.readFileSync(config.cert)
+    };
+    const server = https.createServer(option,function (req,resp) {
         util.freeze(config);
         requestListener.apply(this,[req,resp,config,requestMapping]);
     });
@@ -92,7 +128,7 @@ function requestListener(request,response,config,requestMapping){
         filters = requestListener.filters = filters.concat(requestMapping.getInternalDispatchers());
     }
     const args= [request,response,requestMapping];
-    const filterChain = new FilterChain(filters,args)
+    const filterChain = new FilterChain(filters,args);
     filterChain.next();
 
 }
