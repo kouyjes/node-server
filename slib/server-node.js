@@ -1,6 +1,7 @@
 'use strict';
 const logger = require('./server-logger').getLogger();
 const serverProcess = require('./server-process');
+const util = require('./util');
 function extractCommand(){
     const comParams = process.argv.slice(1);
     var paramConfig = {
@@ -28,13 +29,14 @@ const assert = require('assert'),clone = require('clone');
 const http = require('http');
 function init(config){
     assert(!!config,'config is invalid !');
-    const port = config.port,docBase = config.docBase;
+    const port = config.port;
     if(typeof port !== 'number' || port <= 0){
         throw new TypeError('server port value is invalid !');
     }
 
     const requestMapping = require('./request-mapping')(config);
     const server = http.createServer(function (req,resp) {
+        util.freeze(config);
         requestListener.apply(this,[req,resp,config,requestMapping]);
     });
     server.listen(port);
@@ -49,19 +51,19 @@ if(module.parent){
 }
 class FilterChain{
     constructor(filters,filterArgs,finishCallback){
-        this.index = 0;
+        this.index = {count:0};
         this.filters = filters?filters:[];
         this.filterArgs = filterArgs?filterArgs:[];
         this.finishCallback = finishCallback;
     }
     next(){
-        if(this.index > this.filters.length - 1){
+        if(this.index.count > this.filters.length - 1){
             if(typeof this.finishCallback === 'function'){
                 this.finishCallback.apply(null,this.filterArgs);
             }
             return;
         }
-        var filter = this.filters[this.index++];
+        var filter = this.filters[this.index.count++];
         var isInternal = filter.isInternal;
         var args = isInternal?this.filterArgs:this.filterArgs.slice(0,this.filterArgs.length - 1);
         try{
@@ -76,7 +78,12 @@ class FilterChain{
 }
 function requestListener(request,response,config,requestMapping){
 
+    Object.freeze(config);
     logger.info('request:'+request.url);
+
+    request.getContextConfig = function () {
+        return config;
+    };
 
     //execute filters interrupt if return false
     var filters = requestListener.filters;
@@ -84,7 +91,7 @@ function requestListener(request,response,config,requestMapping){
         filters = requestMapping.getInternalFilters().concat(requestMapping.getUserFilters());
         filters = requestListener.filters = filters.concat(requestMapping.getInternalDispatchers());
     }
-    const args= [request,response,clone(config),requestMapping];
+    const args= [request,response,requestMapping];
     const filterChain = new FilterChain(filters,args)
     filterChain.next();
 

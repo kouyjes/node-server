@@ -21,35 +21,37 @@ function output_304(response){
     response.writeHead(304,{});
     response.end();
 }
-function process_304(chain,request,response,config){
+function process_304(chain,request,response){
     const outputFile = response.outputFile,
         zipOutputStaticResource = response.zipOutputStaticResource,
         outputStaticResource = response.outputStaticResource;
-    response.outputFile = function(pathname,config,acceptEncoding){
+
+    response.zipOutputStaticResource = function (absPath,acceptEncoding) {
+        var args = arguments;
+        return appendFileMeta(request,response,absPath).then(function (flag_304) {
+            if(flag_304){
+                output_304(response);
+                return;
+            }
+            zipOutputStaticResource.apply(response,args);
+        });
+    };
+
+    response.outputStaticResource = function (absPath) {
+        var args = arguments;
+        return appendFileMeta(request,response,absPath).then(function (flag_304) {
+            if(flag_304){
+                output_304(response);
+                return;
+            }
+            outputStaticResource.apply(response,args);
+        });
+    };
+    response.outputFile = function(pathname,acceptEncoding){
         if(pathname !== request.pathname){
             outputFile.apply(response,arguments);
             return;
         }
-        response.zipOutputStaticResource = function (absPath,acceptEncoding) {
-            var args = arguments;
-            return appendFileMeta(request,response,absPath).then(function (flag_304) {
-                if(flag_304){
-                    output_304(response);
-                    return;
-                }
-                zipOutputStaticResource.apply(response,args);
-            });
-        };
-        response.outputStaticResource = function (absPath) {
-            var args = arguments;
-            return appendFileMeta(request,response,absPath).then(function (flag_304) {
-                if(flag_304){
-                    output_304(response);
-                    return;
-                }
-                outputStaticResource.apply(response,args);
-            });
-        };
         outputFile.apply(response,arguments);
     };
     chain.next();

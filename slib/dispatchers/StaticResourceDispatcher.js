@@ -1,9 +1,11 @@
-function execute(chain,request,response,config){
+function execute(chain,request,response){
+
+    const config = request.getContextConfig();
     var acceptEncoding;
     if(config.zipResponse){
         acceptEncoding = request.headers['accept-encoding'];
     }
-    response.outputFile(request.pathname,config,acceptEncoding);
+    response.outputFile(request.pathname,acceptEncoding);
     chain.next();
 }
 execute.priority = -1;

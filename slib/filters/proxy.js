@@ -1,5 +1,7 @@
 const http = require('http');
-function proxy(chain,request,response,config){
+function proxy(chain,request,response){
+
+    const config = request.getContextConfig();
     var proxy = config.proxy;
     var reqUrl = request.url;
     if(proxy && proxy instanceof Array){

@@ -28,15 +28,9 @@ function readFile(absPath){
     });
     return promise;
 }
-function wrapperRequestResponse(chain,request,response,config){
-    function getMime(absPath){
-        var mime = MIME.lookup(PATH.basename(absPath));
-        if(!mime){
-            mime = 'text/html;charset=utf-8';
-        }
-        return mime;
-    }
-    response.setHeader('Server',config.serverName);
+function extendRequestResponse(request,response){
+
+    const config = request.getContextConfig();
     response.sendError = function (errorCode,message) {
         if(!errorCode){
             errorCode = 404;
@@ -95,14 +89,15 @@ function wrapperRequestResponse(chain,request,response,config){
         response.write(content);
         response.end();
     };
-    response.outputFile = function(pathname,config,acceptEncoding){
+    response.outputFile = function(pathname,acceptEncoding){
         var result = config.docBase.some(function (doc) {
             const contextPath  = (doc.path || config.path || '/');
             var currentPathname = checkContextPath(pathname,contextPath);
             if(!currentPathname){
                 return;
             }
-            if(currentPathname.startsWith(doc.filters || Constants.get('config.context.filterDirName')) || currentPathname.startsWith(doc.controllers || Constants.get('config.context.controllerDirName'))){
+            if(currentPathname.startsWith(doc.filters || Constants.get('config.context.filterDirName'))
+                || currentPathname.startsWith(doc.controllers || Constants.get('config.context.controllerDirName'))){
                 return;
             }
 
@@ -121,7 +116,7 @@ function wrapperRequestResponse(chain,request,response,config){
         if(!result){
             response.sendError(404,'404 error not found resource ');
         }
-    }
+    };
 
     request.requestCache = {};
     request.getAttribute = function (name) {
@@ -131,6 +126,18 @@ function wrapperRequestResponse(chain,request,response,config){
         this.requestCache[name] = value;
         return this;
     };
+}
+function getMime(absPath){
+    var mime = MIME.lookup(PATH.basename(absPath));
+    if(!mime){
+        mime = 'text/html;charset=utf-8';
+    }
+    return mime;
+}
+function wrapperRequestResponse(chain,request,response){
+
+    const config = request.getContextConfig();
+    response.setHeader('Server',config.serverName);
     const urlInfo = URL.parse(request.url);
     request.pathname = urlInfo.pathname;
     var queryParam = request.queryParam = {};
@@ -147,6 +154,8 @@ function wrapperRequestResponse(chain,request,response,config){
             queryParam[param[0]] = param[1];
         }
     });
+
+    extendRequestResponse(request,response);
 
     chain.next();
 }

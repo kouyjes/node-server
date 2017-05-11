@@ -1,7 +1,9 @@
 const SESSION_PREFIX = 'nsessionid_';
 const uuid = require('node-uuid');
 const SessionProvider = require('../session/SessionProvider');
-function sessionWrapper(chain,request,response,config){
+function sessionWrapper(chain,request,response){
+
+    const config = request.getContextConfig();
     const sessionKey = SESSION_PREFIX + Number(config.port).toString(16);
     var sessionCookie = request.getCookie(sessionKey);
     var sessionProvider = SessionProvider.getProvider(config);
