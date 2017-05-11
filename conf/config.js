@@ -20,6 +20,7 @@ const config = {
     {
       serverName:'x3 nodejs server', //服务器名称
       zipResponse:true,//对输出进行压缩
+	  protocol:null,//【optional default http】协议定义
       docBase:[  //服务器工作目录
         {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
 		'/workdpace',
@@ -43,6 +44,7 @@ const config = {
       port:[8080], //服务器监听端口,可配置多个
       attributes:{anonymous:false}, //配置自定义属性
 	  proxy:{
+		protocol:null,//【optional default http】 协议定义 
 		pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式
         server:'192.168.1.100', //配置服务端IP
         port:80, //【optional】配置服务端端口，如不配置则与请求端口一致
