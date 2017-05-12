@@ -1,5 +1,6 @@
 const http = require('http'),
-    https = require('https');
+    https = require('https'),
+    fs = require('fs');
 function proxy(chain,request,response){
 
     const config = request.getContextConfig();
@@ -23,12 +24,24 @@ function proxy(chain,request,response){
         port: proxy.port || config.port,
         path: reqUrl,
         method: request.method,
-        headers: request.headers,
-        key:proxy.key,
-        cert:proxy.cert
+        headers: request.headers
     };
 
-    const proxyClient = config.protocol === 'http' ? http : https;
+    var proxyClient = http;
+    if(proxy.protocol === 'https'){
+        if(!proxy.key || !proxy.cert){
+            throw new TypeError('cert and key field must be config when protocol is https !');
+        }
+        if(!fs.existsSync(proxy.key)){
+            throw new TypeError('key file is not exist ! ' + proxy.key);
+        }
+        if(!fs.existsSync(proxy.cert)){
+            throw new TypeError('cert file is not exist ! ' + proxy.cert);
+        }
+        options.key = fs.readFileSync(proxy.key);
+        options.cert = fs.readFileSync(proxy.cert);
+        proxyClient = https;
+    }
 
     var proxyRequest = proxyClient.request(options, function (res) {
         proxy.headers && Object.assign(res.headers || {},proxy.headers);
