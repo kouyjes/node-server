@@ -7,6 +7,10 @@ function appendFileMeta(request,response,absPath){
     const promise = new Promise(function (resolve,reject) {
         fs.stat(absPath, function (err,stats) {
             var flag_304 = false;
+            if(err){
+                reject(flag_304);
+                return;
+            }
             if(stats && stats.mtime instanceof Date){
                 flag_304 = lastMtime && lastMtime === stats.mtime.toUTCString();
                 response.setHeader('Last-Modified',stats.mtime.toUTCString());
