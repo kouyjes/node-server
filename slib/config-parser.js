@@ -6,6 +6,8 @@ function ServerContext(context){
     var properties = [
         {name:'serverName',value:'x3 server'},
         {name:'protocol',value:'http'},
+        {name:'key',value:null},
+        {name:'cert',value:null},
         {name:'zipResponse',value:false},
         {name:'docBase',value:[]},
         {name:'path',value:null},

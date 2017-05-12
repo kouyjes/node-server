@@ -61,10 +61,13 @@ function initHttps(config){
 
     const port = config.port;
     const requestMapping = require('./request-mapping')(config);
-    if(fs.existsSync(config.key)){
+    if(!config.key || !config.cert){
+        throw new TypeError('cert and key field must be config when protocol is https !');
+    }
+    if(!fs.existsSync(config.key)){
         throw new TypeError('key file is not exist ! ' + config.key);
     }
-    if(fs.existsSync(config.cert)){
+    if(!fs.existsSync(config.cert)){
         throw new TypeError('cert file is not exist ! ' + config.cert);
     }
     const option = {
