@@ -1,5 +1,4 @@
-# node-server 配置说明
-<pre>
+'use strict';
 /**
  *
  * @type {{logFilePath: string, multiProcess: boolean, contexts: *[]}}
@@ -13,7 +12,7 @@
  * filters 用户过滤器，根据每个过滤器的priority字段决定调用次序
  * path  上下文路径，此路径会比context.path优先使用
  */
-config = {
+const config = {
   debugMode:false,
   logFilePath:__dirname + '/logger.json', //日志文件路径
   multiProcess:false, //是否对多个contexts启动多进程
@@ -56,4 +55,4 @@ config = {
     }
   ]
 };
-</pre>
+exports.config = config;
