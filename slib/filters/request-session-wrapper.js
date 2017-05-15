@@ -1,16 +1,19 @@
 const SESSION_PREFIX = 'nsessionid_';
-const uuid = require('node-uuid');
+const uuid_v4 = require('uuid/v4');
 const SessionProvider = require('../session/SessionProvider');
 function sessionWrapper(chain,request,response){
 
     const config = request.getContextConfig();
-    const sessionKey = SESSION_PREFIX + Number(config.port).toString(16);
+    const sessionKey = config['sessionCookieName'] || SESSION_PREFIX + Number(config.port).toString(16);
     var sessionCookie = request.getCookie(sessionKey);
     var sessionProvider = SessionProvider.getProvider(config);
 
     var session;
     function createNewSession(sessionId){
-        sessionCookie = request.createCookie(sessionKey,sessionId || uuid.v4());
+        sessionCookie = request.createCookie(sessionKey,sessionId || uuid_v4());
+        if(config['sessionCookiePath']){
+            sessionCookie.setPath(config['sessionCookiePath']);
+        }
         response.addCookie(sessionCookie);
         return sessionProvider.createSession(sessionCookie.value).then(function (newSession) {
             session = newSession;

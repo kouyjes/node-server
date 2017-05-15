@@ -19,12 +19,11 @@ const config = {
   contexts:[
     {
       serverName:'x3 nodejs server', //服务器名称
-      zipResponse:true,//对输出进行压缩
-	  protocol:null,//【optional default http】协议定义
+      zipResponse:false,//对输出进行压缩
       docBase:[  //服务器工作目录
-        {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
-		'/workdpace',
-        {dir:'/',path:'/ctx'}
+		'/opt/x3/www',
+        {dir:'/opt/x3_cube',path:'/x3_cube'},
+			{dir:'/opt/test/kk',path:'/t'}
       ],
       session:{
           provider:{
@@ -41,15 +40,88 @@ const config = {
           timeout:30,//会话过期时间，单位为分，默认30分钟
       },
       path:'/',//上下文路径
-      port:[8080], //服务器监听端口,可配置多个
+      port:[7771], //服务器监听端口,可配置多个
       attributes:{anonymous:false}, //配置自定义属性
-	  proxy:{
-		protocol:null,//【optional default http】 协议定义 
-		pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式
-        server:'192.168.1.100', //配置服务端IP
-        port:80, //【optional】配置服务端端口，如不配置则与请求端口一致
-        headers:{} //【optional】配置发送请求时需要添加的header
-	  }
+      proxy:{
+        pathRule:/^\/api/,
+        server:'172.24.63.45',
+        port:7771,
+        headers:[]
+      }
+    },
+    {
+      serverName:'x3 nodejs server', //服务器名称
+      zipResponse:false,//对输出进行压缩
+      docBase:[  //服务器工作目录
+        '/opt/x3/www',
+        {dir:'/opt/x3_cube',path:'/x3_cube'}
+      ],
+      session:{
+        provider:{
+          type:'file',//会话持久化机制
+          dataFile:'/data/log/session.data' //会话文件
+        },
+        /*
+         provider:{
+         type:'redis',
+         host:'127.0.0.1'
+         //port password
+         },
+         */
+        timeout:30,//会话过期时间，单位为分，默认30分钟
+      },
+      path:'/',//上下文路径
+      port:[7773], //服务器监听端口,可配置多个
+      attributes:{anonymous:true} //配置自定义属性
+    },
+	{
+      serverName:'x3admin nodejs server', //服务器名称
+      zipResponse:true,//对输出进行压缩
+      protocol:'https',
+      key:'../conf/private.pem',
+      cert:'../conf/file.crt',
+      docBase:[  //服务器工作目录
+        '/opt/x3admin/www'
+      ],
+      session:{
+        provider:{
+          type:'file',
+          dataFile:'/data/log/session.data' //会话文件
+        },
+        timeout:30,//会话过期时间，单位为分，默认30分钟
+      },
+      path:'/',//上下文路径
+      port:[7772], //服务器监听端口,可配置多个
+      attributes:{admin:true,anonymous:false}, //配置自定义属性
+      proxy:{
+        pathRule:/^\/adminApi/,
+        server:'172.24.63.42',
+        port:7772,
+        headers:[]
+      }
+    },
+    {
+      serverName:'portal server',
+      protocol:'https',
+      key:'../conf/private.pem',
+      cert:'../conf/file.crt',
+      docBase:['/opt/x3_cube/navigation'],
+      path:'/',
+      proxy:{
+        pathRule:/^\/.+/,
+        server:'172.24.63.42',
+        headers:[]
+      },
+      port:[8080]
+    },
+    {
+      serverName:'portal server',
+      protocol:'https',
+      key:'../conf/private.pem',
+      cert:'../conf/file.crt',
+      docBase:['/opt/test'],
+      path:'/https',
+      port:[8081]
     }
   ]
 };
