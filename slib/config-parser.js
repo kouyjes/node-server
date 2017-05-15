@@ -10,6 +10,8 @@ function ServerContext(context){
         {name:'cert',value:null},
         {name:'zipResponse',value:false},
         {name:'docBase',value:[]},
+        {name:'sessionCookieName',value:null},
+        {name:'sessionCookiePath',value:'/'},
         {name:'path',value:null},
         {name:'anonymous',value:false },
         {name:'port',value:[7771]},
