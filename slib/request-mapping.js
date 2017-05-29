@@ -11,7 +11,8 @@ class RequestMapping{
                 dispatchers:[]
             },
             userFilters:[],
-            urlMapping:{}
+            urlMapping:{},
+            paramUrlMapping:[]
         };
         this._initInternalFilters()
         this._initInternalDispatchers();
@@ -28,7 +29,31 @@ class RequestMapping{
         return this.mapping.userFilters;
     }
     getMatchedRequestHandler(pathInfo){
-        return this.mapping.urlMapping[pathInfo];
+        var method,pathParams = {};;
+        this.mapping.paramUrlMapping.some(function (m) {
+            var match = pathInfo.match(m.urlRegExp);
+            if(match){
+                let vars = m.pathVariables || [];
+                vars = [].concat(vars);
+                match.some(function (key) {
+                    if(vars.length === 0){
+                        return true;
+                    }
+                    let varName = vars.shift();
+                    pathParams[varName] = key;
+                });
+                method = m;
+                return true;
+            }
+        }.bind(this));
+        if(!method){
+            method = this.mapping.urlMapping[pathInfo];;
+        }
+        Object.freeze(pathParams);
+        return {
+            method:method,
+            pathParams:pathParams
+        };
     }
     _initInternalFilters(){
         this._initFilters([{dir:__dirname}],this.mapping.internal.filters,true);
@@ -85,7 +110,7 @@ class RequestMapping{
     }
     _initDocs(config){
         const docs = config.docBase;
-        var mapping = this.mapping.urlMapping;
+        var _ = this;
         docs.forEach(function (d) {
             const contextPath = d.path || config.path || '/';
             var directory = path.resolve(d.dir,d['controllers'] || Constants.get('config.context.controllerDirName'));
@@ -103,30 +128,62 @@ class RequestMapping{
                     if(!file.endsWith('.js')){
                         return;
                     }
-                    const ctrl = require(absPath);
-                    Object.keys(ctrl).forEach(function (k) {
-                        if(!ctrl.hasOwnProperty(k) || typeof ctrl[k] !== 'function'){
-                            return;
-                        }
-                        var mapPath = ctrl[k][Constants.get('config.context.controller.mapping')];
-                        if(!mapPath){
-                            mapPath = path.relative(directory,dir) + '/' + k;
-                            mapPath = contextPath + '/' + mapPath;
-                            mapPath = mapPath.replace(/(\/){2,}/g,'$1');
-                            mapPath = mapPath.replace(/\\/g,'/');
-                        }
-                        if(mapping[mapPath]){
-                            const errorInfo = mapPath + ' mapping has exists!';
-                            logger.info(errorInfo);
-                            throw new EvalError(errorInfo)
-                        }
-                        mapping[mapPath] = ctrl[k];
-                        logger.info('mapping:' + mapPath);
-                    });
+                    const ctrl = require(absPath),
+                        ctrlPath = path.relative(directory,dir);
+
+                    _.initController(contextPath,ctrlPath,ctrl);
                 });
             }
             extractDirectory(directory);
         });
+    }
+    initController(contextPath,ctrlPath,ctrl){
+        var _ = this;
+        Object.keys(ctrl).forEach(function (k) {
+            if(!ctrl.hasOwnProperty(k) || typeof ctrl[k] !== 'function'){
+                return;
+            }
+            var mapPath = ctrl[k][Constants.get('config.context.controller.mapping')];
+            if(!mapPath){
+                mapPath = ctrlPath + '/' + k;
+                mapPath = contextPath + '/' + mapPath;
+                mapPath = mapPath.replace(/(\/){2,}/g,'$1');
+                mapPath = mapPath.replace(/\\/g,'/');
+            }
+            _.addControllerMethod(mapPath,ctrl[k]);
+        });
+    }
+    _mappError(mapPath){
+        const errorInfo = mapPath + ' mapping has exists!';
+        logger.info(errorInfo);
+        throw new EvalError(errorInfo);
+    }
+    addControllerMethod(mapPath,method){
+        var reg = /\{([^\/\}\{]+)\}/g;
+        if(reg.test(mapPath)){
+            let paramUrlMapping = this.mapping.paramUrlMapping;
+            var paramNames = [];
+            let regPath = mapPath.replace(reg, function (match,paramName) {
+                paramNames.push(paramName);
+                return '[^/\\{}]+';
+            });
+            regPath = '^' + regPath + '$';
+            if(paramUrlMapping[regPath]){
+                this._mappError(mapPath);
+            }
+            method.pathVariables = paramNames;
+            method.urlRegExp = new RegExp(regPath,'g');
+            paramUrlMapping.push(method);
+            paramUrlMapping[regPath] = true;
+        }else{
+            let mapping = this.mapping.urlMapping;
+            if(mapping[mapPath]){
+               this._mappError(mapPath);
+            }
+            mapping[mapPath] = method;
+        }
+        logger.info('mapping:' + mapPath);
+
     }
 }
 module.exports = function (docs) {
