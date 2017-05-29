@@ -120,7 +120,7 @@ function requestListener(request,response,config,requestMapping){
     Object.freeze(config);
     logger.info('request:'+request.url);
 
-    request.getContextConfig = function () {
+    response.getContextConfig = request.getContextConfig = function () {
         return config;
     };
 

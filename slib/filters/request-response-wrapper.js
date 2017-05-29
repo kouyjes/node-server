@@ -28,104 +28,116 @@ function readFile(absPath){
     });
     return promise;
 }
+function sendError(errorCode,message) {
+    if(!errorCode){
+        errorCode = 404;
+    }
+    if(!message){
+        message = '';
+    }
+    this.writeHead(errorCode, { 'Content-Type': 'text/html' });
+    this.write(message);
+    this.end();
+}
+function outputStaticResource(absPath) {
+    const _ = this;
+    return readFile(absPath).then(function (data) {
+        var mime = getMime(absPath);
+        _.outputContent(mime,data);
+        return data;
+    }, function () {
+        _.sendError(404,'404 error not found resource ');
+    });
+}
+function zipOutputStaticResource(absPath,encoding) {
+    var _ = this;
+    var readerStream = FS.createReadStream(absPath);
+    var mime = getMime(absPath);
+    _.setHeader('Content-Type',mime);
+    if(encoding.match(/\bdeflate\b/)){
+        _.writeHead(200, { 'Content-encoding': 'deflate' });
+        readerStream.pipe(zlib.createDeflate()).pipe(_);
+    }else if (encoding.match(/\bgzip\b/)) {
+        _.writeHead(200, { 'Content-encoding': 'gzip' });
+        readerStream.pipe(zlib.createGzip()).pipe(_);
+    }else{
+        _.writeHead(200, {});
+        readerStream.pipe(_);
+    }
+}
+function zipOutputContent(mime,content,encoding) {
+
+    const headers = {
+        'Content-Type': mime
+    };
+    const _ = this;
+    var output = content;
+    _.setHeader('Content-Type',mime);
+    if(encoding.match(/\bdeflate\b/)){
+        output = zlib.deflateSync(content);
+        headers['Content-encoding'] = 'deflate';
+    }else if(encoding.match(/\bgzip\b/)){
+        output = zlib.gzip(content);
+        headers['Content-encoding'] = 'gzip';
+    }
+    _.writeHead(200, headers);
+    _.write(output);
+    _.end();
+}
+function outputContent(mime,content) {
+    this.writeHead(200, { 'Content-Type': mime });
+    this.write(content);
+    this.end();
+}
+function outputFile(pathname,acceptEncoding){
+    const _ = this,
+        config = _.getContextConfig();
+    var result = config.docBase.some(function (doc) {
+        const contextPath  = (doc.path || config.path || '/');
+        var currentPathname = checkContextPath(pathname,contextPath);
+        if(!currentPathname){
+            return;
+        }
+        if(currentPathname.startsWith(doc.filters || Constants.get('config.context.filterDirName'))
+            || currentPathname.startsWith(doc.controllers || Constants.get('config.context.controllerDirName'))){
+            return;
+        }
+
+        const absPath = PATH.resolve(doc.dir,currentPathname);
+        var cacheFileMime = filePathCache.syncGet(absPath);
+        if(cacheFileMime || (FS.existsSync(absPath) && !FS.statSync(absPath).isDirectory())){
+            !cacheFileMime && filePathCache.set(absPath,getMime(absPath),3000);
+            if(acceptEncoding){
+                _.zipOutputStaticResource(absPath,acceptEncoding);
+            }else{
+                _.outputStaticResource(absPath);
+            }
+            return true;
+        }
+    });
+    if(!result){
+        _.sendError(404,'404 error not found resource ');
+    }
+}
+function getAttribute(name) {
+    return this.requestCache[name];
+}
+function setAttribute(name,value) {
+    this.requestCache[name] = value;
+    return this;
+}
 function extendRequestResponse(request,response){
 
     const config = request.getContextConfig();
-    response.sendError = function (errorCode,message) {
-        if(!errorCode){
-            errorCode = 404;
-        }
-        if(!message){
-            message = '';
-        }
-        response.writeHead(errorCode, { 'Content-Type': 'text/html' });
-        response.write(message);
-        response.end();
-    };
-    response.outputStaticResource = function (absPath) {
-        return readFile(absPath).then(function (data) {
-            var mime = getMime(absPath);
-            response.outputContent(mime,data);
-            return data;
-        }, function () {
-            response.sendError(404,'404 error not found resource ');
-        });
-    };
-    response.zipOutputStaticResource = function (absPath,encoding) {
-        var readerStream = FS.createReadStream(absPath);
-        var mime = getMime(absPath);
-        response.setHeader('Content-Type',mime);
-        if(encoding.match(/\bdeflate\b/)){
-            response.writeHead(200, { 'Content-encoding': 'deflate' });
-            readerStream.pipe(zlib.createDeflate()).pipe(response);
-        }else if (encoding.match(/\bgzip\b/)) {
-            response.writeHead(200, { 'Content-encoding': 'gzip' });
-            readerStream.pipe(zlib.createGzip()).pipe(response);
-        }else{
-            response.writeHead(200, {});
-            readerStream.pipe(response);
-        }
-    };
-    response.zipOutputContent = function (mime,content,encoding) {
-
-        const headers = {
-            'Content-Type': mime
-        };
-        var output = content;
-        response.setHeader('Content-Type',mime);
-        if(encoding.match(/\bdeflate\b/)){
-            output = zlib.deflateSync(content);
-            headers['Content-encoding'] = 'deflate';
-        }else if(encoding.match(/\bgzip\b/)){
-            output = zlib.gzip(content);
-            headers['Content-encoding'] = 'gzip';
-        }
-        response.writeHead(200, headers);
-        response.write(output);
-        response.end();
-    };
-    response.outputContent = function (mime,content) {
-        response.writeHead(200, { 'Content-Type': mime });
-        response.write(content);
-        response.end();
-    };
-    response.outputFile = function(pathname,acceptEncoding){
-        var result = config.docBase.some(function (doc) {
-            const contextPath  = (doc.path || config.path || '/');
-            var currentPathname = checkContextPath(pathname,contextPath);
-            if(!currentPathname){
-                return;
-            }
-            if(currentPathname.startsWith(doc.filters || Constants.get('config.context.filterDirName'))
-                || currentPathname.startsWith(doc.controllers || Constants.get('config.context.controllerDirName'))){
-                return;
-            }
-
-            const absPath = PATH.resolve(doc.dir,currentPathname);
-            var cacheFileMime = filePathCache.syncGet(absPath);
-            if(cacheFileMime || (FS.existsSync(absPath) && !FS.statSync(absPath).isDirectory())){
-                !cacheFileMime && filePathCache.set(absPath,getMime(absPath),3000);
-                if(acceptEncoding){
-                    response.zipOutputStaticResource(absPath,acceptEncoding);
-                }else{
-                    response.outputStaticResource(absPath);
-                }
-                return true;
-            }
-        });
-        if(!result){
-            response.sendError(404,'404 error not found resource ');
-        }
-    };
-
+    response.sendError = sendError;
+    response.outputStaticResource = outputStaticResource;
+    response.zipOutputStaticResource = zipOutputStaticResource;
+    response.zipOutputContent = zipOutputContent;
+    response.outputContent = outputContent;
+    response.outputFile = outputFile;
     request.requestCache = {};
-    request.getAttribute = function (name) {
-        return this.requestCache[name];
-    };
-    request.setAttribute = function (name,value) {
-        this.requestCache[name] = value;
-        return this;
-    };
+    request.getAttribute = getAttribute;
+    request.setAttribute = setAttribute;
 }
 function getMime(absPath){
     var mime = MIME.lookup(PATH.basename(absPath));
