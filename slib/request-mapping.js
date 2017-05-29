@@ -2,6 +2,7 @@
 const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
 const Constants = require('./Constants');
+const pathParamReg = /\{([^\/\}\{]+)\}/g;
 class RequestMapping{
     constructor(config){
 
@@ -35,6 +36,7 @@ class RequestMapping{
             if(match){
                 let vars = m.pathVariables || [];
                 vars = [].concat(vars);
+                match.shift();
                 match.some(function (key) {
                     if(vars.length === 0){
                         return true;
@@ -159,20 +161,19 @@ class RequestMapping{
         throw new EvalError(errorInfo);
     }
     addControllerMethod(mapPath,method){
-        var reg = /\{([^\/\}\{]+)\}/g;
-        if(reg.test(mapPath)){
+        if(pathParamReg.test(mapPath)){
             let paramUrlMapping = this.mapping.paramUrlMapping;
             var paramNames = [];
-            let regPath = mapPath.replace(reg, function (match,paramName) {
+            let regPath = mapPath.replace(pathParamReg, function (match,paramName) {
                 paramNames.push(paramName);
-                return '[^/\\{}]+';
+                return '([^/\\{}]+)';
             });
             regPath = '^' + regPath + '$';
             if(paramUrlMapping[regPath]){
                 this._mappError(mapPath);
             }
             method.pathVariables = paramNames;
-            method.urlRegExp = new RegExp(regPath,'g');
+            method.urlRegExp = new RegExp(regPath);
             paramUrlMapping.push(method);
             paramUrlMapping[regPath] = true;
         }else{
