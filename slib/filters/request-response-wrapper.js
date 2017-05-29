@@ -36,8 +36,7 @@ function sendError(errorCode,message) {
         message = '';
     }
     this.writeHead(errorCode, { 'Content-Type': 'text/html' });
-    this.write(message);
-    this.end();
+    this.end(message);
 }
 function outputStaticResource(absPath) {
     const _ = this;
@@ -81,13 +80,11 @@ function zipOutputContent(mime,content,encoding) {
         headers['Content-encoding'] = 'gzip';
     }
     _.writeHead(200, headers);
-    _.write(output);
-    _.end();
+    _.end(output);
 }
 function outputContent(mime,content) {
     this.writeHead(200, { 'Content-Type': mime });
-    this.write(content);
-    this.end();
+    this.end(content);
 }
 function outputFile(pathname,acceptEncoding){
     const _ = this,
