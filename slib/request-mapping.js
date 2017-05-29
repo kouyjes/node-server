@@ -42,7 +42,7 @@ class RequestMapping{
                         return true;
                     }
                     let varName = vars.shift();
-                    pathParams[varName] = key;
+                    pathParams[varName] = decodeURI(key);
                 });
                 method = m;
                 return true;
