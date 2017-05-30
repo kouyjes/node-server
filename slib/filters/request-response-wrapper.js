@@ -139,7 +139,7 @@ function extendRequestResponse(request,response){
 function getMime(absPath){
     var mime = MIME.lookup(PATH.basename(absPath));
     if(!mime){
-        mime = 'text/html;charset=utf-8';
+        mime = 'text/html';
     }
     return mime;
 }
