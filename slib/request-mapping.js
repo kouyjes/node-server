@@ -1,4 +1,5 @@
 'use strict';
+const ParamUrlMapping = require('./ParamUrlMapping');
 const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
 const Constants = require('./Constants');
@@ -13,7 +14,7 @@ class RequestMapping{
             },
             userFilters:[],
             urlMapping:{},
-            paramUrlMapping:[]
+            paramUrlMapping:new ParamUrlMapping()
         };
         this._initInternalFilters()
         this._initInternalDispatchers();
@@ -30,32 +31,20 @@ class RequestMapping{
         return this.mapping.userFilters;
     }
     getMatchedRequestHandler(pathInfo){
-        var method,pathParams = {};;
-        this.mapping.paramUrlMapping.some(function (m) {
-            var match = pathInfo.match(m.urlRegExp);
-            if(match){
-                let vars = m.pathVariables || [];
-                vars = [].concat(vars);
-                match.shift();
-                match.some(function (key) {
-                    if(vars.length === 0){
-                        return true;
-                    }
-                    let varName = vars.shift();
-                    pathParams[varName] = decodeURI(key);
-                });
-                method = m;
-                return true;
-            }
-        }.bind(this));
-        if(!method){
-            method = this.mapping.urlMapping[pathInfo];;
+
+        var methodInfo = this.mapping.paramUrlMapping.matchMethod(pathInfo);
+        if(methodInfo){
+            return methodInfo;
         }
-        Object.freeze(pathParams);
-        return {
-            method:method,
-            pathParams:pathParams
-        };
+        let method = this.mapping.urlMapping[pathInfo];
+        if(!method){
+            return null;
+        }
+        methodInfo = {
+            method:this.mapping.urlMapping[pathInfo],
+            pathParams:Object.freeze({})
+        }
+        return methodInfo;
     }
     _initInternalFilters(){
         this._initFilters([{dir:__dirname}],this.mapping.internal.filters,true);
@@ -161,21 +150,9 @@ class RequestMapping{
         throw new EvalError(errorInfo);
     }
     addControllerMethod(mapPath,method){
-        if(pathParamReg.test(mapPath)){
-            let paramUrlMapping = this.mapping.paramUrlMapping;
-            var paramNames = [];
-            let regPath = mapPath.replace(pathParamReg, function (match,paramName) {
-                paramNames.push(paramName);
-                return '([^/\\{}]+)';
-            });
-            regPath = '^' + regPath + '$';
-            if(paramUrlMapping[regPath]){
-                this._mappError(mapPath);
-            }
-            method.pathVariables = paramNames;
-            method.urlRegExp = new RegExp(regPath);
-            paramUrlMapping.push(method);
-            paramUrlMapping[regPath] = true;
+
+        if(ParamUrlMapping.isContainPathParam(mapPath)){
+            this.mapping.paramUrlMapping.parseMapPath(mapPath,method);
         }else{
             let mapping = this.mapping.urlMapping;
             if(mapping[mapPath]){
