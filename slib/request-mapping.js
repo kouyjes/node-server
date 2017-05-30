@@ -12,7 +12,6 @@ class RequestMapping{
                 dispatchers:[]
             },
             userFilters:[],
-            urlMapping:{},
             paramUrlMapping:new ParamUrlMapping()
         };
         this._initInternalFilters()
@@ -32,17 +31,6 @@ class RequestMapping{
     getMatchedRequestHandler(pathInfo){
 
         var methodInfo = this.mapping.paramUrlMapping.matchMethod(pathInfo);
-        if(methodInfo){
-            return methodInfo;
-        }
-        let method = this.mapping.urlMapping[pathInfo];
-        if(!method){
-            return null;
-        }
-        methodInfo = {
-            method:this.mapping.urlMapping[pathInfo],
-            pathParams:Object.freeze({})
-        }
         return methodInfo;
     }
     _initInternalFilters(){
@@ -150,16 +138,7 @@ class RequestMapping{
     }
     addControllerMethod(mapPath,method){
 
-        if(ParamUrlMapping.isContainPathParam(mapPath)){
-            this.mapping.paramUrlMapping.parseMapPath(mapPath,method);
-        }else{
-            let mapping = this.mapping.urlMapping;
-            if(mapping[mapPath]){
-               this._mappError(mapPath);
-            }
-            mapping[mapPath] = method;
-        }
-        logger.info('mapping:' + mapPath);
+        this.mapping.paramUrlMapping.parseMapPath(mapPath,method);
 
     }
 }

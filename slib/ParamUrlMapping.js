@@ -1,4 +1,5 @@
 'use strict';
+const logger = require('./server-logger').getLogger();
 const pathCheckParamReg = /\{([^\/\}\{]+)\}/,
     pathParamReg = /\{([^\/\}\{]+)\}/g;
 class PathRoute{
@@ -21,34 +22,51 @@ class ParamUrlMapping{
     }
     constructor(){
         this.pathRoute = new PathRoute();
+        this.pathMapping = {};
+    }
+    _mappError(mapPath){
+        const errorInfo = mapPath + ' mapping has exists!';
+        logger.info(errorInfo);
+        throw new EvalError(errorInfo);
     }
     parseMapPath(mapPath,method){
-        var pathRoute = this.pathRoute;
-        var paths = mapPath.split(/\//);
+        if(ParamUrlMapping.isContainPathParam(mapPath)){
+            let pathRoute = this.pathRoute;
+            let paths = mapPath.split(/\//);
 
-        paths.some(function (path) {
-            if(!path){
-                return;
+            paths.some(function (path) {
+                if(!path){
+                    return;
+                }
+                if(pathCheckParamReg.test(path)){
+                    var paramNames = [];
+                    let regPath = mapPath.replace(pathParamReg, function (match,paramName) {
+                        paramNames.push(paramName);
+                        return '([^/\\{}]+)';
+                    });
+                    regPath = '^' + regPath + '$';
+                    method.pathVariables = paramNames;
+                    method.urlRegExp = new RegExp(regPath);
+                    pathRoute.methods.push(method);
+                    return true;
+                }
+                let pRoute = pathRoute.findRoute(path);
+                if(!pRoute){
+                    pathRoute = pathRoute.addRoute(new PathRoute(path));
+                }else{
+                    pathRoute = pRoute;
+                }
+            });
+        }else{
+            let mapping = this.pathMapping;
+            if(mapping[mapPath]){
+                this._mappError(mapPath);
             }
-            if(pathCheckParamReg.test(path)){
-                var paramNames = [];
-                let regPath = mapPath.replace(pathParamReg, function (match,paramName) {
-                    paramNames.push(paramName);
-                    return '([^/\\{}]+)';
-                });
-                regPath = '^' + regPath + '$';
-                method.pathVariables = paramNames;
-                method.urlRegExp = new RegExp(regPath);
-                pathRoute.methods.push(method);
-                return true;
-            }
-            let pRoute = pathRoute.findRoute(path);
-            if(!pRoute){
-                pathRoute = pathRoute.addRoute(new PathRoute(path));
-            }else{
-                pathRoute = pRoute;
-            }
-        });
+            mapping[mapPath] = method;
+        }
+
+        logger.info('mapping:' + mapPath);
+
     }
     matchMethod(mapPath){
         var pathRoute = this.pathRoute;
@@ -89,7 +107,10 @@ class ParamUrlMapping{
             }
         });
         if(!method){
-            return null;
+            method = this.pathMapping[mapPath];
+        }
+        if(!method){
+            return;
         }
         Object.freeze(pathParams);
         return {
