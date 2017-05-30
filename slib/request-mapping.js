@@ -3,7 +3,6 @@ const ParamUrlMapping = require('./ParamUrlMapping');
 const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
 const Constants = require('./Constants');
-const pathParamReg = /\{([^\/\}\{]+)\}/g;
 class RequestMapping{
     constructor(config){
 
