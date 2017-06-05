@@ -125,7 +125,6 @@ function setAttribute(name,value) {
 }
 function extendRequestResponse(request,response){
 
-    const config = request.getContextConfig();
     response.sendError = sendError;
     response.outputStaticResource = outputStaticResource;
     response.zipOutputStaticResource = zipOutputStaticResource;
