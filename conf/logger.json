@@ -4,7 +4,6 @@
     "server-sys":"INFO"
   },
   "appenders": [
-    {"type": "console"},
     {
       "type": "file",
       "absolute": true,
