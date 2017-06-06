@@ -3,11 +3,6 @@ const configParser = require('./config-parser'),serverConfig = configParser.getS
 const logger = require('./server-logger').getLogger();
 const clone = require('clone');
 const serverProcess = require('./server-process');
-if(serverConfig.debugMode){
-    logger.setLevel('DEBUG');
-}else {
-    logger.setLevel('ERROR');
-}
 const serverContexts = serverConfig.getContexts();
 const nodePath = process.execPath;
 serverContexts.forEach(function (ctx) {

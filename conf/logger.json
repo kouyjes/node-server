@@ -1,4 +1,8 @@
 {
+  "levels":{
+    "default":"ERROR",
+    "server-sys":"INFO"
+  },
   "appenders": [
     {"type": "console"},
     {
