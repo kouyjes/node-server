@@ -18,7 +18,7 @@ function proxy(chain,request,response){
         chain.next();
         return;
     }
-    
+
     var options = {
         hostname: proxy.server,
         port: proxy.port || config.port,
