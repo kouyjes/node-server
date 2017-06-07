@@ -48,7 +48,7 @@ config = {
       attributes:{anonymous:false}, //配置自定义属性
 	  proxy:{
 		protocol:null,//【optional default http】 协议定义 
-		pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式
+		pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式字符串
         server:'192.168.1.100', //配置服务端IP
         port:80, //【optional】配置服务端端口，如不配置则与请求端口一致
         headers:{} //【optional】配置发送请求时需要添加的header

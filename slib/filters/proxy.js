@@ -14,11 +14,13 @@ function proxy(chain,request,response){
             }
         });
     }
-    if(!proxy || !proxy.pathRule || !proxy.server || !reqUrl.match(proxy.pathRule)){
+    if(!proxy || !proxy.pathRule || !proxy.server || !reqUrl.match(new RegExp(proxy.pathRule))){
         chain.next();
         return;
     }
 
+    response.end(JSON.stringify(config));
+    return;
     var options = {
         hostname: proxy.server,
         port: proxy.port || config.port,
