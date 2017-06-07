@@ -3,10 +3,14 @@ const logger = require('./server-logger').getLogger();
 const serverProcess = require('./server-process');
 const util = require('./util');
 const assert = require('assert'),clone = require('clone');
+const cluster = require('cluster');
+const cpuNum = require('os').cpus().length;
 const http = require('http'),
     https = require('https');
 
 const fs = require('fs');
+
+const isMasterProcess = module.parent ? false : true;
 
 const initFunctions = {
     http:initHttp,
@@ -44,7 +48,19 @@ function init(config){
     }
 
     const protocol = config.protocol;
-    initFunctions[protocol].call(this,config);
+    if(isMasterProcess && config.multiCpuSupport){
+        if(cluster.isMaster){
+            for(let i = 0;i < cpuNum;i++){
+                cluster.fork();
+            }
+        }else{
+            initFunctions[protocol].call(this,config);
+        }
+    }else{
+        initFunctions[protocol].call(this,config);
+    }
+
+
 
 }
 function initHttp(config){
@@ -80,13 +96,13 @@ function initHttps(config){
     });
     server.listen(port);
 }
-if(module.parent){
+if(isMasterProcess){
+    init(extractCommand().value);
+    serverProcess.process();
+}else{
     module.exports = {
         startServer:init
     };
-}else{
-    init(extractCommand().value);
-    serverProcess.process();
 }
 class FilterChain{
     constructor(filters,filterArgs,finishCallback){
@@ -111,7 +127,6 @@ class FilterChain{
             let response = this.filterArgs[1];
             response.sendError && response.sendError(500,'server internal error!');
             logger.error(e);
-            throw e;
         }
     }
 }

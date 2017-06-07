@@ -2,7 +2,6 @@ const FS = require('fs'),PATH = require('path'),MIME = require('mime'),URL = req
 const zlib = require('zlib');
 const XCache = require('../cache');
 const filePathCache = new XCache();
-const Promise = require('promise');
 const Constants = require('../Constants');
 function checkContextPath(pathname,contextPath){
     if(!pathname.startsWith(contextPath)){
@@ -14,19 +13,6 @@ function checkContextPath(pathname,contextPath){
     }
     pathname = pathname.replace(/^\/+/,'');
     return pathname;
-}
-
-function readFile(absPath){
-    const promise = new Promise(function (resolve,reject) {
-        FS.readFile(absPath, function (err, data) {
-           if(err){
-               reject(err);
-           }else{
-               resolve(data);
-           }
-        });
-    });
-    return promise;
 }
 function sendError(errorCode,message) {
     if(!errorCode){
@@ -40,12 +26,12 @@ function sendError(errorCode,message) {
 }
 function outputStaticResource(absPath) {
     const _ = this;
-    return readFile(absPath).then(function (data) {
-        var mime = getMime(absPath);
-        _.outputContent(mime,data);
-        return data;
-    }, function () {
-        _.sendError(404,'404 error not found resource ');
+    FS.exists(absPath, function (exists) {
+        if(exists){
+            FS.createReadStream(absPath).pipe(_);
+        }else{
+            _.sendError(404,'404 error not found resource ');
+        }
     });
 }
 function zipOutputStaticResource(absPath,encoding) {

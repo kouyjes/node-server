@@ -23,5 +23,5 @@ function freeze(chain,request,response){
 
     chain.next();
 }
-freeze.priority = -1;
+freeze.priority = -100;
 exports.execute = freeze;

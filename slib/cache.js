@@ -11,8 +11,9 @@ class XCache{
         this.cacheProvider.set( key, value,timeout);
     }
     get(key){
+        var _ = this;
         var promise = new Promise(function (resolve, reject) {
-            this.cacheProvider.get( key,function( err, value ){
+            _.cacheProvider.get( key,function( err, value ){
                 if( !err && value){
                     resolve(value);
                 }else{

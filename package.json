@@ -8,7 +8,9 @@
   },
   "author": "koujp",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "node-gyp": "^3.6.2"
+  },
   "dependencies": {
     "clone": "^1.0.2",
     "log4js": "^0.6.36",

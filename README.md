@@ -20,6 +20,7 @@ config = {
   contexts:[
     {
       serverName:'x3 nodejs server', //服务器名称
+      multiCpuSupport:false,//根据CPU数量,启动多个进程,配置为true时，需要配置为redis session
       zipResponse:true,//对输出进行压缩
 	  protocol:null,//【optional default http】协议定义
 	  sessionCookieName:null,//【optional】

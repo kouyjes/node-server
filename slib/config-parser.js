@@ -23,7 +23,8 @@ function ServerContext(context){
             }
         }},
         {name:'attributes',value:{}},
-        {name:'proxy',value:null}
+        {name:'proxy',value:null},
+        {name:'multiCpuSupport',value:false}
     ];
     properties.forEach(function (property) {
         var setInvoke = this['set' + property.name.substring(0,1).toUpperCase() + property.name.substring(1)];
