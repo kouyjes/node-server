@@ -12,7 +12,7 @@ function configCROS(chain,request,response){
             value:'Content-Type,Set-Cookie'
         },
         {
-            name:'access-control-allow-headers',
+            name:'access-control-allow-credentials',
             value:true
         }
     ];

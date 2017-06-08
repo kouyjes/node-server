@@ -29,6 +29,7 @@ const config = {
 		'/workdpace',
         {dir:'/',path:'/ctx'}
       ],
+      //optional 不配置session时不会启用session
       session:{
           provider:{
               type:'file',//会话持久化机制

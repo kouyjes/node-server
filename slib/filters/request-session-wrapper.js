@@ -4,6 +4,10 @@ const SessionProvider = require('../session/SessionProvider');
 function sessionWrapper(chain,request,response){
 
     const config = request.getContextConfig();
+    if(!config.session){
+        chain.next();
+        return;
+    }
     const sessionKey = config['sessionCookieName'] || SESSION_PREFIX + Number(config.port).toString(16);
     var sessionCookie = request.getCookie(sessionKey);
     var sessionProvider = SessionProvider.getProvider(config);

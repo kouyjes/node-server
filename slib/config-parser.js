@@ -15,13 +15,7 @@ function ServerContext(context){
         {name:'path',value:null},
         {name:'anonymous',value:false },
         {name:'port',value:[7771]},
-        {name:'session',value:{
-            timeout:30,
-            provider:{
-                type:'file',
-                dataFile:'./session.data'
-            }
-        }},
+        {name:'session',value:false},
         {name:'attributes',value:{}},
         {name:'proxy',value:null},
         {name:'multiCpuSupport',value:false}
@@ -47,17 +41,14 @@ class CustomError extends TypeError{
 };
 ServerContext.prototype.setSession = function (session) {
     this.session = session;
+    if(!this.session || typeof session !== 'object'){
+        this.session = false;
+        return;
+    }
     const provider = {
         type:'file',
         dataFile:'./session.data'
     };
-    if(!this.session){
-        this.session = {
-            timeout:30,
-            provider:provider
-        };
-        return;
-    }
     if(typeof session.timeout !== 'number'){
         session.timeout = 60;
     }
