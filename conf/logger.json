@@ -1,9 +1,13 @@
 {
   "levels":{
-    "default":"ERROR",
+    "server-console":"INFO",
     "server-sys":"INFO"
   },
   "appenders": [
+    {
+      "type": "console",
+      "category": "server-console"
+    },
     {
       "type": "file",
       "absolute": true,

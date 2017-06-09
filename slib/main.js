@@ -1,10 +1,22 @@
+const serverLogger = require('./server-logger'),
+    logger = serverLogger.getLogger(),
+    consoleLogger = serverLogger.getConsoleLogger();
+
+process.on('uncaughtException',function (err) {
+    logger.error(err);
+    consoleLogger.error(err);
+    process.exit(0);
+});
+
 const path = require('path'),childProcess = require('child_process'),fs = require('fs');
 const configParser = require('./config-parser'),serverConfig = configParser.getServerConfig();
-const logger = require('./server-logger').getLogger();
 const clone = require('clone');
 const serverProcess = require('./server-process');
 const serverContexts = serverConfig.getContexts();
 const nodePath = process.execPath;
+
+consoleLogger.info('starting Server ...');
+
 serverContexts.forEach(function (ctx) {
     const apps = [];
     const ports = ctx.port;
@@ -18,6 +30,10 @@ serverContexts.forEach(function (ctx) {
     });
     const serverNode = require('./server-node');
     apps.forEach(function (app) {
+
+        consoleLogger.info('starting init server with context...');
+        consoleLogger.info('config:\n' + JSON.stringify(app,null,4));
+
         if(!serverConfig.multiProcess){
             serverNode.startServer(app.config);
             return;
@@ -30,19 +46,24 @@ serverContexts.forEach(function (ctx) {
 
         const pro = childProcess.spawn(nodePath,params);
         pro.stdout.on('data', function (data) {
-            logger.error(String.fromCharCode.apply(null, data));
+            let message = data.toString();
+            logger.info(message);
+            consoleLogger.info(message);
         });
         pro.stderr.on('data', function (data) {
-            logger.error(String.fromCharCode.apply(null, data));
+            let errorInfo = data.toString();
+            logger.error(errorInfo);
+            consoleLogger.error(errorInfo);
         });
         pro.on('exit', function (data) {
-            logger.info(data);
+            let message = data.toString();
+            logger.info(message);
+            consoleLogger.info(message);
         })
     });
 });
-process.on('uncaughtException',function (err) {
-    logger.error(err);
-    process.exit(0);
-});
 
 serverProcess.startProcess();
+
+consoleLogger.info('Server startup finished !');
+
