@@ -1,5 +1,7 @@
 'use strict';
-const logger = require('./server-logger').getLogger();
+const serverLogger = require('./server-logger'),
+    logger = serverLogger.getLogger(),
+    consoleLogger = serverLogger.getConsoleLogger();
 const serverProcess = require('./server-process');
 const util = require('./util');
 const assert = require('assert'),clone = require('clone');
@@ -53,6 +55,16 @@ function init(config){
             for(let i = 0;i < cpuNum;i++){
                 cluster.fork();
             }
+            cluster.on('exit', function (oldWorker) {
+                let message = 'worker-' + oldWorker.process.pid + ' died !';
+                logger.error(message);
+                consoleLogger.error(message);
+
+                let worker = cluster.fork();
+                message = 'worker-' + worker.process.pid + ' started !';
+                logger.warn(message);
+                consoleLogger.warn(message);
+            });
         }else{
             initFunctions[protocol].call(this,config);
         }
