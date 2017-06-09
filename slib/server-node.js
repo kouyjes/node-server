@@ -65,16 +65,18 @@ function init(config){
 }
 function initHttp(config){
 
+    util.freeze(config);
     const port = config.port;
     const requestMapping = require('./request-mapping')(config);
     const server = http.createServer(function (req,resp) {
-        util.freeze(config);
-        requestListener.apply(this,[req,resp,config,requestMapping]);
+        let params = [req,resp,config,requestMapping];
+        requestListener.apply(this,params);
     });
     server.listen(port);
 }
 function initHttps(config){
 
+    util.freeze(config);
     const port = config.port;
     const requestMapping = require('./request-mapping')(config);
     if(!config.key || !config.cert){
@@ -91,8 +93,8 @@ function initHttps(config){
         cert:fs.readFileSync(config.cert)
     };
     const server = https.createServer(option,function (req,resp) {
-        util.freeze(config);
-        requestListener.apply(this,[req,resp,config,requestMapping]);
+        let params = [req,resp,config,requestMapping];
+        requestListener.apply(this,params);
     });
     server.listen(port);
 }
@@ -132,7 +134,6 @@ class FilterChain{
 }
 function requestListener(request,response,config,requestMapping){
 
-    Object.freeze(config);
     logger.info('request',request.url);
 
     response.getContextConfig = request.getContextConfig = function () {
