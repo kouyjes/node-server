@@ -43,7 +43,7 @@ serverContexts.forEach(function (ctx) {
         const appFile = path.resolve(__dirname,'server-node.js');
         const params = [appFile];
         params.push('--config');
-        params.push(new Buffer(JSON.stringify(app.config)).toString('base64'));
+        params.push(Buffer.from(JSON.stringify(app.config)).toString('base64'));
 
         const pro = childProcess.spawn(nodePath,params);
         pro.stdout.on('data', function (data) {
