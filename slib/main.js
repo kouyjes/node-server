@@ -1,3 +1,4 @@
+'use strict'
 const serverLogger = require('./server-logger'),
     logger = serverLogger.getLogger(),
     consoleLogger = serverLogger.getConsoleLogger();
