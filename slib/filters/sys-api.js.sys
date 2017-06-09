@@ -1,0 +1,17 @@
+const heapdump = require('heapdump');
+function startGC(chain,request,response){
+    if(request.url.startsWith('/_system_/startGC')){
+        heapdump.writeSnapshot('/opt/debug/' + Date.now() + '.heapsnapshot', function (err) {
+            if(err){
+                response.end(JSON.stringify(err));
+            }else{
+                response.end('success');
+            }
+        });
+
+    }else{
+        chain.next();
+    }
+}
+exports.priority = 0;
+exports.execute = startGC;
