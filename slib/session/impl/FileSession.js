@@ -21,7 +21,7 @@ class FileSession extends Session{
         }
         return this.provider.syncSession(this,property);
     }
-    _getSyncAttrbute(name){
+    _getSyncAttribute(name){
         var promise = new Promise(function (resolve,reject) {
             resolve(this.getAttribute(name));
         }.bind(this));
@@ -29,7 +29,7 @@ class FileSession extends Session{
     }
     getAttribute(name,async){
         if(async){
-            return this._getSyncAttrbute(name);
+            return this._getSyncAttribute(name);
         }
         return this.attributes[name];
     }

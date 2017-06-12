@@ -34,7 +34,7 @@ class RedisSessionProvider extends SessionProvider{
      * @returns Session instance
      */
     getSession(sessionId,create){
-        var promise = new Promise(function (resolve) {
+        var promise = new Promise(function (resolve,reject) {
             var session = null;
             try{
                 this.redisClient.hgetall(this._getSessionKey(sessionId), function (err,obj) {
@@ -61,10 +61,12 @@ class RedisSessionProvider extends SessionProvider{
         return promise;
     }
     getAttribute(sessionId,key){
-        var promise = new Promise(function (resolve) {
+        var promise = new Promise(function (resolve,reject) {
             this.redisClient.hget(this._getSessionKey(sessionId),key, function (err,value) {
                 if(err){
                     logger.error(err);
+                    reject(err);
+                    return;
                 }
                 resolve(value);
             })
@@ -77,7 +79,7 @@ class RedisSessionProvider extends SessionProvider{
     /**
      * create a new session which id is sessionId
      * @param sessionId
-     * @returns {Session|exports|module.exports}
+     * @returns promise
      */
     createSession(sessionId){
         var session = new Session(sessionId,this);
@@ -88,8 +90,13 @@ class RedisSessionProvider extends SessionProvider{
         return promise;
     }
     _syncString(hid,key,value){
-        var promise = new Promise(function (resolve) {
-            this.redisClient.hset(hid,key,value, function () {
+        var promise = new Promise(function (resolve,reject) {
+            this.redisClient.hset(hid,key,value, function (err) {
+                if(err){
+                    logger.error(err);
+                    reject(err);
+                    return;
+                }
                 logger.info(arguments);
                 resolve();
             });
@@ -105,9 +112,13 @@ class RedisSessionProvider extends SessionProvider{
             }
             hsetArgs.push(key,value);
         }.bind(this));
-        var promsie = new Promise(function (resolve) {
-            this.redisClient.hmset(hsetArgs, function () {
-                logger.info(arguments);
+        var promsie = new Promise(function (resolve,reject) {
+            this.redisClient.hmset(hsetArgs, function (err) {
+                if(err){
+                    logger.error(err);
+                    reject(err);
+                    return;
+                }
                 resolve();
             });
         }.bind(this));
@@ -127,6 +138,7 @@ class RedisSessionProvider extends SessionProvider{
                 resolve();
                 if(err){
                     logger.error(err);
+                    reject(err);
                 }
             }.bind(this));
         }.bind(this));

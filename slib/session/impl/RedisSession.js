@@ -20,12 +20,12 @@ class RedisSession extends Session{
         }
         return this.provider.syncSession(this,property);
     }
-    _getSyncAttrbute(name){
+    _getSyncAttribute(name){
         return this.provider.getAttribute(name);
     }
     getAttribute(name,async){
         if(async){
-            return this._getSyncAttrbute(name);
+            return this._getSyncAttribute(name);
         }
         return this.attributes[name];
     }

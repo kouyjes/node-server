@@ -62,7 +62,7 @@ class FileSessionProvider extends SessionProvider{
     /**
      * create a new session which id is sessionId
      * @param sessionId
-     * @returns {Session|exports|module.exports}
+     * @returns promise
      */
     createSession(sessionId){
         var session = this.sessionCache[sessionId] = new Session(sessionId,this);
@@ -111,7 +111,7 @@ class FileSessionProvider extends SessionProvider{
         var content = null,dataFile = this.dataFile;
         if(fs.existsSync(dataFile)){
             content = fs.readFileSync(dataFile);
-            content = new Buffer(content).toString('utf-8');
+            content = Buffer.from(content).toString('utf-8');
         }
         return content;
     }

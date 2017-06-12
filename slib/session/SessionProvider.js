@@ -26,7 +26,7 @@ class SessionProvider{
     /**
      * create a new session which id is sessionId
      * @param sessionId
-     * @returns {Session|exports|module.exports}
+     * @returns promise
      */
     createSession(sessionId){
         throw new Error('method is not implemented !');
