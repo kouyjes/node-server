@@ -5,9 +5,12 @@ class FileSession extends Session{
     constructor(id,provider){
         super(id,provider);
         this.attributes = {};
-        this.time = {
-            modifiedDate:new Date()
-        }
+        Object.defineProperty(this,'time',{
+            value:{
+                modifiedDate:new Date()
+            },
+            enumerable:false
+        });
     }
     setAttribute(name,value){
         this.attributes[name] = value;
@@ -53,13 +56,7 @@ class FileSession extends Session{
         return ((new Date()).getTime() - this.time.modifiedDate.getTime())/1000 > timeout;
     }
     toString(){
-        return JSON.stringify(this, function (key,val) {
-            if(['id','time','provider'].indexOf(key) >= 0){
-                return undefined;
-            }else{
-                return val;
-            }
-        });
+        return JSON.stringify(this);
     }
 }
 module.exports = FileSession;

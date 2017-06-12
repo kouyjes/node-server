@@ -1,8 +1,14 @@
 'use strict';
 class Session{
     constructor(id,provider){
-        this.id = id;
-        this.provider = provider?provider:null;
+        Object.defineProperty(this,'id',{
+            value:id,
+            enumerable:false
+        });
+        Object.defineProperty(this,'provider',{
+            value:provider ? provider : null,
+            enumerable:false
+        });
     }
     getId(){
         return this.id;
@@ -45,13 +51,7 @@ class Session{
         throw new Error('method is not implemented !');
     }
     toString(){
-        return JSON.stringify(this, function (key,val) {
-            if(['id','provider'].indexOf(key) >= 0){
-                return undefined;
-            }else{
-                return val;
-            }
-        });
+        return JSON.stringify(this);
     }
 }
 module.exports = Session;
