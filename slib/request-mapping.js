@@ -131,11 +131,6 @@ class RequestMapping{
             _.addControllerMethod(mapPath,ctrl[k]);
         });
     }
-    _mappError(mapPath){
-        const errorInfo = mapPath + ' mapping has exists!';
-        logger.info(errorInfo);
-        throw new EvalError(errorInfo);
-    }
     addControllerMethod(mapPath,method){
 
         this.mapping.paramUrlMapping.parseMapPath(mapPath,method);
