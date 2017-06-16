@@ -9,6 +9,7 @@ function ServerContext(context){
         {name:'key',value:null},
         {name:'cert',value:null},
         {name:'zipResponse',value:false},
+        {name:'disabledAgentCache',value:false},
         {name:'docBase',value:[]},
         {name:'sessionCookieName',value:null},
         {name:'sessionCookiePath',value:'/'},
