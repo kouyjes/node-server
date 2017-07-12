@@ -1,5 +1,5 @@
 # node-server 配置说明
-<pre>
+```javascript
 /**
  *
  * @type {{logFilePath: string, multiProcess: boolean, contexts: *[]}}
@@ -58,4 +58,4 @@ config = {
     }
   ]
 };
-</pre>
+```
