@@ -26,6 +26,13 @@ function output_304(response){
     response.end();
 }
 function process_304(chain,request,response){
+
+    const config = request.getContextConfig();
+    if(config.disabledAgentCache){
+        chain.next();
+        return;
+    }
+
     const outputFile = response.outputFile,
         zipOutputStaticResource = response.zipOutputStaticResource,
         outputStaticResource = response.outputStaticResource;
