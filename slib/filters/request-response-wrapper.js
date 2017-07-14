@@ -26,6 +26,8 @@ function sendError(errorCode,message) {
 }
 function outputStaticResource(absPath) {
     const _ = this;
+    var mime = getMime(absPath);
+    _.setHeader('Content-Type',mime);
     FS.exists(absPath, function (exists) {
         if(exists){
             FS.createReadStream(absPath).pipe(_);
