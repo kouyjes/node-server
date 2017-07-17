@@ -1,4 +1,9 @@
-# node-server 配置说明
+# node-server
+node-server is a http server,a proxy server
+### Get Starting
+First add a config file in conf directory for node=server,the config demo is in the same directory
+
+####  node-server 配置说明
 ```javascript
 /**
  *
@@ -59,3 +64,37 @@ config = {
   ]
 };
 ```
+### Develop with node-server
+#### Define filter in filters directory of same path which config.js defines
+```javascript
+    function loginFilter(chain,request,response){
+        //todo
+        chain.next();
+    }
+    loginFilter.priority = 1; //[optional]
+    exports.execute = loginFilter
+```
+#### Define controller in controllers directory
+```javascript
+    function getUsers(request,response){
+        var users = [];
+        var result = JSON.stringify(users);
+        response.outputContent('application/json',result);
+    }
+    exports.users = getUsers;
+    
+    //request url http://localhost/users
+    
+    //you can also change default url mapping rule
+    function getBooks(request response){
+        var pathParams = request.pathParams;
+        var userId = pathParams.userId;
+        var books = [];
+        var result = JSON.stringify(books);
+        response.outputContent('application/json',result);
+    }
+    getBooks.$mappingUrl = '/users/{userId}'
+    exports.books = getBooks;
+    //request url http://localhost/users/123
+```
+
