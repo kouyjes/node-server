@@ -55,7 +55,7 @@ ServerContext.prototype.setSession = function (session) {
         session.timeout = 60;
     }
     if(session.provider){
-        Object.assign(session.provider,provider);
+        Object.assign(provider,session.provider);
     }
     session.provider = provider;
 };
