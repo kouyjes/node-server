@@ -1,7 +1,7 @@
 const util = {},
-    baseTypes = ['array','string','number','undefined'];
-function isBaseType(value){
-    if(value === null){
+    baseTypes = ['array', 'string', 'number', 'undefined'];
+function isBaseType(value) {
+    if (value === null) {
         return true;
     }
     return baseTypes.indexOf(typeof value) >= 0;

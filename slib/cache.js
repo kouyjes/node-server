@@ -1,22 +1,24 @@
 'use strict';
 const logger = require('./logger/server-logger').getAppLogger();
-var NodeCache = require( "node-cache" );
+var NodeCache = require("node-cache");
 
 const Promise = require('promise');
-class XCache{
-    constructor(){
+class XCache {
+    constructor() {
         this.cacheProvider = new NodeCache();
     }
-    set(key,value,timeout){
-        this.cacheProvider.set( key, value,timeout);
+
+    set(key, value, timeout) {
+        this.cacheProvider.set(key, value, timeout);
     }
-    get(key){
+
+    get(key) {
         var _ = this;
         var promise = new Promise(function (resolve, reject) {
-            _.cacheProvider.get( key,function( err, value ){
-                if( !err && value){
+            _.cacheProvider.get(key, function (err, value) {
+                if (!err && value) {
                     resolve(value);
-                }else{
+                } else {
                     logger.error(err);
                     reject(err);
                 }
@@ -24,16 +26,20 @@ class XCache{
         });
         return promise;
     }
-    syncGet(key){
+
+    syncGet(key) {
         return this.cacheProvider.get(key);
     }
-    del(key){
+
+    del(key) {
         this.cacheProvider.del(key);
     }
-    close(){
+
+    close() {
         this.cacheProvider.close();
     }
-    flushAll(){
+
+    flushAll() {
         this.cacheProvider.flushAll();
     }
 }

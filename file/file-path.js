@@ -1,10 +1,10 @@
 const path = require('path');
 const dirName = path.dirname(__dirname);
-function resolve(dir,file) {
-    if(file === void 0){
-        return path.resolve(dirName,dir);
+function resolve(dir, file) {
+    if (file === void 0) {
+        return path.resolve(dirName, dir);
     }
-    return path.resolve(dir,file);
+    return path.resolve(dir, file);
 };
 exports.resolve = resolve;
 exports.getPidPath = function () {
@@ -14,7 +14,7 @@ exports.getRuntimePath = function () {
     return resolve('runtime');
 };
 exports.getLogConfPath = function () {
-    return resolve('./conf/logger.json');
+    return resolve('./conf/logger.js');
 };
 exports.getServerConfPath = function () {
     return resolve('./conf/config.js');

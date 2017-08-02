@@ -1,16 +1,16 @@
 const logger = require('../logger/server-logger').getAppLogger();
-function execute(chain,request,response,requestMapping){
+function execute(chain, request, response, requestMapping) {
     const handlerInfo = requestMapping.getMatchedRequestHandler(request.pathname);
-    if(handlerInfo){
-        try{
-            Object.defineProperty(request,'pathParams',{
-                value:handlerInfo.pathParams
+    if (handlerInfo) {
+        try {
+            Object.defineProperty(request, 'pathParams', {
+                value: handlerInfo.pathParams
             });
-            handlerInfo.method.call(handlerInfo.method,request,response);
+            handlerInfo.method.call(handlerInfo.method, request, response);
 
-        }catch (e){
+        } catch (e) {
             logger.error(e);
-            response.sendError(500,'server internal error !' + JSON.stringify(e));
+            response.sendError(500, 'server internal error !' + JSON.stringify(e));
         }
         return;
     }

@@ -1,10 +1,10 @@
 const SESSION_PREFIX = 'nsessionid_';
 const uuid_v4 = require('uuid/v4');
 const SessionProvider = require('../session/SessionProvider');
-function sessionWrapper(chain,request,response){
+function sessionWrapper(chain, request, response) {
 
     const config = request.getContextConfig();
-    if(!config.session){
+    if (!config.session) {
         chain.next();
         return;
     }
@@ -13,9 +13,10 @@ function sessionWrapper(chain,request,response){
     var sessionProvider = SessionProvider.getProvider(config);
 
     var session;
-    function createNewSession(sessionId){
-        sessionCookie = request.createCookie(sessionKey,sessionId || uuid_v4());
-        if(config['sessionCookiePath']){
+
+    function createNewSession(sessionId) {
+        sessionCookie = request.createCookie(sessionKey, sessionId || uuid_v4());
+        if (config['sessionCookiePath']) {
             sessionCookie.setPath(config['sessionCookiePath']);
         }
         response.addCookie(sessionCookie);
@@ -23,7 +24,8 @@ function sessionWrapper(chain,request,response){
             session = newSession;
         });
     }
-    function continueTick(){
+
+    function continueTick() {
         session = Object.freeze(session);
         request.getSession = function () {
             return session;
@@ -31,17 +33,18 @@ function sessionWrapper(chain,request,response){
         session.update();
         chain.next();
     }
-    if(null === sessionCookie){
+
+    if (null === sessionCookie) {
         createNewSession().then(function () {
             continueTick();
         });
-    }else{
-        sessionProvider.getSession(sessionCookie.value,false).then(function (newSession) {
-            if(!newSession){
+    } else {
+        sessionProvider.getSession(sessionCookie.value, false).then(function (newSession) {
+            if (!newSession) {
                 createNewSession(sessionCookie.value).then(function () {
                     continueTick();
                 });
-            }else{
+            } else {
                 session = newSession;
                 continueTick();
             }

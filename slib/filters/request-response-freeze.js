@@ -1,23 +1,23 @@
 const util = require('../util/util');
 const requestAttributes = [
-        'getContextConfig','getAttribute','setAttribute','pathname','queryParam','getSession'
+        'getContextConfig', 'getAttribute', 'setAttribute', 'pathname', 'queryParam', 'getSession'
     ],
     responseAttributes = [
-        'sendError','outputStaticResource','zipOutputStaticResource','zipOutputContent','outputFile'
+        'sendError', 'outputStaticResource', 'zipOutputStaticResource', 'zipOutputContent', 'outputFile'
     ];
-function freeze(chain,request,response){
+function freeze(chain, request, response) {
 
     requestAttributes.forEach(function (attr) {
         var value = request[attr];
-        Object.defineProperty(request,attr,{
-            value:value
+        Object.defineProperty(request, attr, {
+            value: value
         })
     });
 
     responseAttributes.forEach(function (attr) {
         var value = response[attr];
-        Object.defineProperty(response,attr,{
-            value:value
+        Object.defineProperty(response, attr, {
+            value: value
         })
     });
 

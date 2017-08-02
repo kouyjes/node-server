@@ -1,16 +1,16 @@
-const fs = require('fs'),path = require('path');
+const fs = require('fs'), path = require('path');
 const filePath = require('../../file/file-path');
 const pidPath = filePath.getPidPath();
-function _process(){
+function _process() {
     var pidContent = '';
-    if(fs.existsSync(pidPath)){
+    if (fs.existsSync(pidPath)) {
         pidContent = new Buffer(fs.readFileSync(pidPath)).toString('utf-8');
     }
-    fs.writeFileSync(pidPath,(pidContent?pidContent + '\n':'') + process.pid);
+    fs.writeFileSync(pidPath, (pidContent ? pidContent + '\n' : '') + process.pid);
 
 }
-function startProcess(){
-    fs.writeFileSync(pidPath,'');
+function startProcess() {
+    fs.writeFileSync(pidPath, '');
     _process();
 }
 exports.process = _process;
