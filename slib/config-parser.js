@@ -1,7 +1,6 @@
 'use strict';
 const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
-const config = require(path.dirname(__dirname) + '/conf/config.js').config;
 function ServerContext(context){
     var properties = [
         {name:'serverName',value:'x3 server'},
@@ -162,7 +161,7 @@ ServerConfig.prototype.setContexts = function (contexts) {
     });
     this.contexts = contexts;
 };
-function getServerConfig(){
+function getServerConfig(config){
     return new ServerConfig(config);
 }
 exports.getServerConfig = getServerConfig;
