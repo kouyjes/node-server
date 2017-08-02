@@ -2,16 +2,12 @@
 
 const path = require('path'),childProcess = require('child_process'),fs = require('fs');
 const clone = require('clone');
-const serverProcess = require('./core/server-process');
-
-const configParser = require('./config/config-parser');
-
-const Runtime = require('./Runtime');
-
-const nodePath = process.execPath;
 
 const filePath = require('../file/file-path');
-
+const configParser = require('./config/config-parser');
+const Runtime = require('./Runtime');
+const serverProcess = require('./core/server-process');
+const nodePath = process.execPath;
 
 function startServer(config){
 
@@ -23,7 +19,7 @@ function startServer(config){
 
     const serverContexts = serverConfig.getContexts();
 
-    logger.info('starting Server ...');
+    logger.welcome('starting Server ...');
 
     serverContexts.forEach(function (ctx) {
         const apps = [];
@@ -39,9 +35,9 @@ function startServer(config){
         const serverNode = require('./core/server-node');
         apps.forEach(function (app) {
 
-            logger.info('starting init server with context...');
+            logger.welcome('starting init server with context...');
             let configString = 'config:\n' + JSON.stringify(app,null,4);
-            logger.info(configString);
+            logger.welcome(configString);
 
             if(!serverConfig.multiProcess){
                 serverNode.startServer(app.config);
@@ -77,7 +73,7 @@ function startServer(config){
         process.exit(0);
     });
 
-    logger.info('Server startup finished !');
+    logger.welcome('Server startup finished !');
 }
 
 if(module.parent){

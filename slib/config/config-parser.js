@@ -1,5 +1,7 @@
 'use strict';
 const fs = require('fs'),path = require('path');
+const filePath = require('../../file/file-path');
+const defaultFileSession = filePath.resolve(filePath.getRuntimePath(),'session.data');
 function ServerContext(context){
     var properties = [
         {name:'serverName',value:'x3 server'},
@@ -47,14 +49,15 @@ ServerContext.prototype.setSession = function (session) {
     }
     const provider = {
         type:'file',
-        dataFile:'./session.data'
+        dataFile:defaultFileSession
     };
     if(typeof session.timeout !== 'number'){
         session.timeout = 60;
     }
-    if(!session.provider){
-        session.provider = provider;
+    if(session.provider){
+        Object.assign(session.provider,provider);
     }
+    session.provider = provider;
 };
 ServerContext.prototype.setDocBase = function (docBase) {
     if(!docBase){

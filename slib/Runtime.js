@@ -1,9 +1,12 @@
 
 const fs = require('fs');
-const Runtime = require('../file/file-path');
-const runtimeConfFile = Runtime.getRuntimeConfPath();
+const filePath = require('../file/file-path');
+const runtimeConfFile = filePath.getRuntimeConfPath();
 exports.getConfig = function () {
-    return require(runtimeConfFile);
+    if(fs.existsSync(runtimeConfFile)){
+        return require(runtimeConfFile);
+    }
+    return new Object();
 };
 exports.updateConfig = function (config) {
     var configString = JSON.stringify(config,null,4);

@@ -15,9 +15,13 @@ function getLogger(category) {
 };
 
 class Logger{
-    info(){
+    welcome(){
         consoleLogger.info.apply(consoleLogger,arguments);
+        logger.info.apply(logger,arguments);
+    }
+    info(){
         if(serverConfig.debugMode){
+            consoleLogger.info.apply(consoleLogger,arguments);
             logger.info.apply(logger,arguments);
         }
     }

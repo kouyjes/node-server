@@ -2,7 +2,6 @@
 const ParamUrlMapping = require('./ParamUrlMapping');
 const fs = require('fs'),path = require('path');
 const Constants = require('./../config/Constants');
-
 const filePath = require('../../file/file-path');
 class RequestMapping{
     constructor(config){
