@@ -1,4 +1,4 @@
-const util = require('../util');
+const util = require('../util/util');
 const requestAttributes = [
         'getContextConfig','getAttribute','setAttribute','pathname','queryParam','getSession'
     ],

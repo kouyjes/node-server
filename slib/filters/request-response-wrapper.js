@@ -2,7 +2,7 @@ const FS = require('fs'),PATH = require('path'),MIME = require('mime'),URL = req
 const zlib = require('zlib');
 const XCache = require('../cache');
 const filePathCache = new XCache();
-const Constants = require('../Constants');
+const Constants = require('../config/Constants');
 function checkContextPath(pathname,contextPath){
     if(!pathname.startsWith(contextPath)){
         return null;

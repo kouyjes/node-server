@@ -1,7 +1,7 @@
 'use strict';
 const SessionProvider =  require('../SessionProvider');
 const Session =  require('./RedisSession');
-const logger = require('../../server-logger').getLogger();
+const logger = require('../../logger/server-logger').getAppLogger();
 const Promise = require('promise');
 function initRedisClient(config){
     var redis = require("redis");

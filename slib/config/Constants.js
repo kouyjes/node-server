@@ -15,5 +15,6 @@ function define(name,value){
 }
 define('config.context.controllerDirName','controllers')
 ('config.context.filterDirName','filters')
-('config.context.controller.mapping','$mappingUrl');
+('config.context.controller.mapping','$mappingUrl')
+('runtimeConfig','../runtime/runtime.json');
 exports.get = get;

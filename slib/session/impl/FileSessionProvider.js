@@ -2,7 +2,7 @@
 const SessionProvider =  require('../SessionProvider');
 const Session = require('./FileSession');
 const fs = require('fs');
-const logger = require('../../server-logger').getLogger();
+const logger = require('../../logger/server-logger').getAppLogger();
 const Promise = require('promise');
 class FileSessionProvider extends SessionProvider{
     constructor(config){

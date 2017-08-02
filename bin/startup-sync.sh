@@ -2,11 +2,11 @@
 currentPath=`pwd`
 serverPath=$(dirname "$0")
 cd $serverPath
-stateFile="../server-pid/state"
+stateFile="../runtime/state"
 echo "" > $stateFile
 while true
 do
-    stateContent=`cat ../server-pid/state`
+    stateContent=`cat ../runtime/state`
     if [ "$stateContent" = "break" ]
     then
         break

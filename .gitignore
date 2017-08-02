@@ -1,3 +1,6 @@
 /.idea
 /node_modules
 /conf/config.js
+/log/node-server.log
+/runtime/server.pid
+/runtime/state

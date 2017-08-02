@@ -1,9 +1,9 @@
 'use strict';
-const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
 function ServerContext(context){
     var properties = [
         {name:'serverName',value:'x3 server'},
+        {name:'debugMode',value:false},
         {name:'protocol',value:'http'},
         {name:'key',value:null},
         {name:'cert',value:null},
@@ -68,7 +68,6 @@ ServerContext.prototype.setDocBase = function (docBase) {
     }
     if(!(docBase instanceof Array)){
         errorInfo = 'parameter type is invalid !' + JSON.stringify(docBase);
-        logger.error(errorInfo);
         throw new CustomError(errorInfo)
     }
     docBase = docBase.map(function (v) {
@@ -77,12 +76,10 @@ ServerContext.prototype.setDocBase = function (docBase) {
                 return {dir:v};
             }else{
                 errorInfo = 'parameter type is invalid !' + JSON.stringify(v);
-                logger.error(errorInfo);
                 throw new CustomError(errorInfo);
             }
         }else if(typeof v.dir !== 'string'){
             errorInfo = 'dir is invalid,string type needed !' + JSON.stringify(v);
-            logger.error(errorInfo);
             throw new CustomError(errorInfo);
         }
         return v;
@@ -99,7 +96,6 @@ ServerContext.prototype.setPort = function (port) {
     }
     if(!(port instanceof Array)){
         errorInfo = 'parameter type is invalid ,number value needed !' + JSON.stringify(port);
-        logger.error(errorInfo);
         throw new CustomError(errorInfo);
     }
     const result = port.every(function (v) {
@@ -107,7 +103,6 @@ ServerContext.prototype.setPort = function (port) {
     });
     if(!result){
         errorInfo = 'parameter type is invalid ,number value needed !';
-        logger.error(errorInfo);
         throw new CustomError(errorInfo);
     }
     this.port = port;
@@ -132,8 +127,9 @@ ServerConfig.prototype.init = function (config) {
     const ctxs = config.contexts;
     const contexts = this.contexts = [];
     if(ctxs instanceof Array){
-        ctxs.forEach(function (ctx,index) {
+        ctxs.forEach((ctx,index) => {
             ctx.index = index;
+            ctx.debugMode = this.debugMode;
             contexts.push(new ServerContext(ctx));
         });
     }

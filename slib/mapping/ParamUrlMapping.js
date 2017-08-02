@@ -1,5 +1,5 @@
 'use strict';
-const logger = require('./server-logger').getLogger();
+const logger = require('./../logger/server-logger').getAppLogger();
 const pathCheckParamReg = /\{([^\/\}\{]+)\}/,
     pathParamReg = /\{([^\/\}\{]+)\}/g;
 class PathRoute{

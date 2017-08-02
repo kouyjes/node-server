@@ -1,28 +1,29 @@
 'use strict'
-const serverLogger = require('./server-logger'),
-    logger = serverLogger.getLogger(),
-    consoleLogger = serverLogger.getConsoleLogger();
-process.on('uncaughtException',function (err) {
-    logger.error(err);
-    consoleLogger.error(err);
-    process.exit(0);
-});
 
 const path = require('path'),childProcess = require('child_process'),fs = require('fs');
 const clone = require('clone');
-const serverProcess = require('./server-process');
+const serverProcess = require('./core/server-process');
 
-const configParser = require('./config-parser');
+const configParser = require('./config/config-parser');
+
+const Runtime = require('./Runtime');
 
 const nodePath = process.execPath;
+
+const filePath = require('../file/file-path');
 
 
 function startServer(config){
 
     const serverConfig = configParser.getServerConfig(config);
+    Runtime.updateConfig(serverConfig);
+
+    const serverLogger = require('./logger/server-logger'),
+        logger = serverLogger.getAppLogger();
+
     const serverContexts = serverConfig.getContexts();
 
-    consoleLogger.info('starting Server ...');
+    logger.info('starting Server ...');
 
     serverContexts.forEach(function (ctx) {
         const apps = [];
@@ -35,11 +36,12 @@ function startServer(config){
                 config:ctxConfig
             });
         });
-        const serverNode = require('./server-node');
+        const serverNode = require('./core/server-node');
         apps.forEach(function (app) {
 
-            consoleLogger.info('starting init server with context...');
-            consoleLogger.info('config:\n' + JSON.stringify(app,null,4));
+            logger.info('starting init server with context...');
+            let configString = 'config:\n' + JSON.stringify(app,null,4);
+            logger.info(configString);
 
             if(!serverConfig.multiProcess){
                 serverNode.startServer(app.config);
@@ -55,30 +57,33 @@ function startServer(config){
             pro.stdout.on('data', function (data) {
                 let message = data.toString();
                 logger.info(message);
-                consoleLogger.info(message);
             });
             pro.stderr.on('data', function (data) {
                 let errorInfo = data.toString();
                 logger.error(errorInfo);
-                consoleLogger.error(errorInfo);
             });
             pro.on('exit', function (data) {
                 let message = data.toString();
                 logger.info(message);
-                consoleLogger.info(message);
             })
         });
     });
 
     serverProcess.startProcess();
 
-    consoleLogger.info('Server startup finished !');
+    // exception handler
+    process.on('uncaughtException',function (err) {
+        logger.error(err);
+        process.exit(0);
+    });
+
+    logger.info('Server startup finished !');
 }
 
 if(module.parent){
     exports.startServer = startServer;
 }else{
-    startServer(require(path.resolve(path.dirname(__dirname),'conf/config.js')).config);
+    startServer(require(filePath.getServerConfPath()).config);
 }
 
 

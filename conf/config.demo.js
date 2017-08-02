@@ -1,4 +1,4 @@
-'use strict';
+
 /**
  *
  * @type {{logFilePath: string, multiProcess: boolean, contexts: *[]}}
@@ -11,30 +11,31 @@
  * controllers 用户控制器逻辑,可根据目录路径生成请求路径和控制规则关系
  * filters 用户过滤器，根据每个过滤器的priority字段决定调用次序
  * path  上下文路径，此路径会比context.path优先使用
+ *
+ *
  */
+'use strict';
+var filePath = require('../file/file-path');
 const config = {
-    debugMode: false,
-    logFilePath: __dirname + '/logger.json', //日志文件路径
-    multiProcess: false, //是否对多个contexts启动多进程
-    contexts: [
+    debugMode:true,
+    multiProcess:false, //是否对多个contexts启动多进程
+    contexts:[
         {
-            serverName: 'x3 nodejs server', //服务器名称
-            multiCpuSupport: false,//根据CPU数量,启动多个进程,配置为true时，需要配置为redis session
-            zipResponse: true,//对输出进行压缩
-            // disabledAgentCache:false,//禁用客户端缓存
-            protocol: null,//【optional default http】协议定义
-            sessionCookieName: null,//【optional】
-            sessionCookiePath: null,//【optional default /】
-            docBase: [  //服务器工作目录
-                {dir: '/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
-                '/workdpace',
-                {dir: '/', path: '/ctx'}
+            serverName:'web server', //服务器名称
+            multiCpuSupport:true,//根据CPU数量,启动多个进程,配置为true时，需要配置为redis session
+            zipResponse:false,//对输出进行压缩
+            sessionCookieName:'x3_session',//【optional】
+            sessionCookiePath:null,//【optional default /】
+            //protocol:'https', // 【default http】
+            //key:filePath.resolve('conf/private.pem'), //
+            //cert:filePath.resolve('conf/file.crt'), //
+            docBase:[  //服务器工作目录
+                '/www'
             ],
-            //optional 不配置session时不会启用session
-            session: {
-                provider: {
-                    type: 'file',//会话持久化机制
-                    dataFile: '/data/log/session.data' //会话文件
+            session:{
+                provider:{
+                    type:'file',//会话持久化机制
+                    dataFile:'/data/log/session.data' //会话文件
                 },
                 /*
                  provider:{
@@ -43,17 +44,16 @@ const config = {
                  //port password
                  },
                  */
-                timeout: 30,//会话过期时间，单位为分，默认30分钟
+                timeout:30,//会话过期时间，单位为分，默认30分钟
             },
-            path: '/',//上下文路径
-            port: [8080], //服务器监听端口,可配置多个
-            attributes: {anonymous: false}, //配置自定义属性
-            proxy: {
-                protocol: null,//【optional default http】 协议定义
-                pathRule: null,//【required】配置需要代理url的匹配规则，为正则表达式字符串
-                server: '192.168.1.100', //配置服务端IP
-                port: 80, //【optional】配置服务端端口，如不配置则与请求端口一致
-                headers: {} //【optional】配置发送请求时需要添加的header
+            path:'/',//上下文路径
+            port:[8080], //服务器监听端口,可配置多个
+            attributes:{anonymous:false}, //配置自定义属性
+            proxy:{
+                pathRule:'^/api',
+                server:'192.168.100.123',
+                port:7771,
+                headers:[]
             }
         }
     ]

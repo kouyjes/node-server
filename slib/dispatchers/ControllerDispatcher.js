@@ -1,4 +1,4 @@
-const logger = require('../server-logger').getLogger();
+const logger = require('../logger/server-logger').getAppLogger();
 function execute(chain,request,response,requestMapping){
     const handlerInfo = requestMapping.getMatchedRequestHandler(request.pathname);
     if(handlerInfo){

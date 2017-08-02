@@ -1,8 +1,9 @@
 'use strict';
 const ParamUrlMapping = require('./ParamUrlMapping');
-const logger = require('./server-logger').getLogger();
 const fs = require('fs'),path = require('path');
-const Constants = require('./Constants');
+const Constants = require('./../config/Constants');
+
+const filePath = require('../../file/file-path');
 class RequestMapping{
     constructor(config){
 
@@ -34,10 +35,10 @@ class RequestMapping{
         return methodInfo;
     }
     _initInternalFilters(){
-        this._initFilters([{dir:__dirname}],this.mapping.internal.filters,true);
+        this._initFilters([{dir:filePath.getInternalLibPath()}],this.mapping.internal.filters,true);
     }
     _initInternalDispatchers(){
-        this._initFilters([{dir:__dirname,filters:'dispatchers'}],this.mapping.internal.dispatchers,true);
+        this._initFilters([{dir:filePath.getInternalLibPath(),filters:'dispatchers'}],this.mapping.internal.dispatchers,true);
     }
     _initUserFilters(config){
         this._initFilters(config.docBase,this.mapping.userFilters,false);

@@ -1,4 +1,4 @@
-const Cookie = require('../Cookie');
+const Cookie = require('../cookie/Cookie');
 const assert = require('assert');
 function requestCookieWrapper(chain,request,response){
     var cookieString = request.headers.cookie;

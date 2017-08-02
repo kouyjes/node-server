@@ -18,9 +18,10 @@ First add a config file in conf directory for node=server,the config demo is in 
  * filters 用户过滤器，根据每个过滤器的priority字段决定调用次序
  * path  上下文路径，此路径会比context.path优先使用
  */
+ 
+ var filePath = require('../file/file-path');
 config = {
   debugMode:false,
-  logFilePath:__dirname + '/logger.json', //日志文件路径
   multiProcess:false, //是否对多个contexts启动多进程
   contexts:[
     {
@@ -30,6 +31,10 @@ config = {
 	  protocol:null,//【optional default http】协议定义
 	  sessionCookieName:null,//【optional】
 	  sessionCookiePath:null,//【optional default /】
+	  //protocol:'https', // 【default http】
+      //key:filePath.resolve('conf/private.pem'), //
+      //cert:filePath.resolve('conf/file.crt'), //
+      //disabledAgentCache:true, //禁用客户端缓存
       docBase:[  //服务器工作目录
         {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
 		'/workdpace',

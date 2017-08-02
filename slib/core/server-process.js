@@ -1,5 +1,6 @@
 const fs = require('fs'),path = require('path');
-const pidPath = path.dirname(__dirname) + '/server-pid/server.pid';
+const filePath = require('../../file/file-path');
+const pidPath = filePath.getPidPath();
 function _process(){
     var pidContent = '';
     if(fs.existsSync(pidPath)){

@@ -1,9 +1,8 @@
 'use strict';
-const serverLogger = require('./server-logger'),
-    logger = serverLogger.getLogger(),
-    consoleLogger = serverLogger.getConsoleLogger();
+const serverLogger = require('../logger/server-logger'),
+    logger = serverLogger.getAppLogger();
 const serverProcess = require('./server-process');
-const util = require('./util');
+const util = require('./../util/util');
 const assert = require('assert'),clone = require('clone');
 const cluster = require('cluster');
 const cpuNum = require('os').cpus().length;
@@ -58,12 +57,10 @@ function init(config){
             cluster.on('exit', function (oldWorker) {
                 let message = 'worker-' + oldWorker.process.pid + ' died !';
                 logger.error(message);
-                consoleLogger.error(message);
 
                 let worker = cluster.fork();
                 message = 'worker-' + worker.process.pid + ' started !';
                 logger.warn(message);
-                consoleLogger.warn(message);
             });
         }else{
             initFunctions[protocol].call(this,config);
@@ -79,7 +76,7 @@ function initHttp(config){
 
     util.freeze(config);
     const port = config.port;
-    const requestMapping = require('./request-mapping')(config);
+    const requestMapping = require('./../mapping/request-mapping')(config);
     const server = http.createServer(function (req,resp) {
         let params = [req,resp,config,requestMapping];
         requestListener.apply(this,params);
@@ -90,7 +87,7 @@ function initHttps(config){
 
     util.freeze(config);
     const port = config.port;
-    const requestMapping = require('./request-mapping')(config);
+    const requestMapping = require('./../mapping/request-mapping')(config);
     if(!config.key || !config.cert){
         throw new TypeError('cert and key field must be config when protocol is https !');
     }
