@@ -51,6 +51,12 @@ class RequestMapping {
 
     _initUserFilters(config) {
         this._initFilters(config.docBase, this.mapping.userFilters, false);
+        this.mapping.userFilters.forEach(function (filter) {
+            var key = Constants.get('config.context.filter.path');
+            if(!filter[key]){
+                filter[key] = config.path || '/';
+            }
+        });
     }
 
     _initFilters(dirs, filters, isInternal) {
@@ -77,6 +83,9 @@ class RequestMapping {
                         };
                         filter.priority = ctrl.execute.priority || 0;
                         filter.isInternal = isInternal;
+                        if(!isInternal){
+                            filter[Constants.get('config.context.filter.path')] = d.path;
+                        }
                         filters.push(filter);
                     }
                 });
@@ -155,8 +164,20 @@ class RequestMapping {
         this.mapping.paramUrlMapping.parseMapPath(mapPath, method);
 
     }
+
+    getMatchedUserFilters(url){
+        url = url || '';
+        return this.mapping.userFilters.filter(function (filter) {
+            var key = Constants.get('config.context.filter.path');
+            var filterContextPath = filter[key];
+            if(!filterContextPath){
+                return false;
+            }
+            return url.startsWith(filterContextPath);
+        });
+    }
 }
-module.exports = function (docs) {
-    return new RequestMapping(docs);
+module.exports = function (config) {
+    return new RequestMapping(config);
 };
 

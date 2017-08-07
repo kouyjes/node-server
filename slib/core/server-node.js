@@ -150,11 +150,9 @@ function requestListener(request, response, config, requestMapping) {
     };
 
     //execute filters interrupt if return false
-    var filters = requestListener.filters;
-    if (!filters) {
-        filters = requestMapping.getInternalFilters().concat(requestMapping.getUserFilters());
-        filters = requestListener.filters = filters.concat(requestMapping.getInternalDispatchers());
-    }
+    var filters = requestMapping.getInternalFilters();
+    filters = filters.concat(requestMapping.getMatchedUserFilters(request.url));
+    filters = filters.concat(requestMapping.getInternalDispatchers());;
     const args = [request, response, requestMapping];
     const filterChain = new FilterChain(filters, args);
     filterChain.next();
