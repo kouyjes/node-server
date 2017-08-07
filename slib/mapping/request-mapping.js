@@ -141,9 +141,11 @@ class RequestMapping {
             if (!mapPath) {
                 mapPath = ctrlPath + '/' + k;
                 mapPath = contextPath + '/' + mapPath;
-                mapPath = mapPath.replace(/(\/){2,}/g, '$1');
-                mapPath = mapPath.replace(/\\/g, '/');
+            }else{
+                mapPath = contextPath + '/' + mapPath;
             }
+            mapPath = mapPath.replace(/(\/){2,}/g, '$1');
+            mapPath = mapPath.replace(/\\/g, '/');
             _.addControllerMethod(mapPath, ctrl[k]);
         });
     }
