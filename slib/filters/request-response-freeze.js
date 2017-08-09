@@ -1,9 +1,9 @@
 const util = require('../util/util');
 const requestAttributes = [
-        'getContextConfig', 'getAttribute', 'setAttribute', 'pathname', 'queryParam', 'getSession'
+        'getContextConfig','getRequestMapping', 'getAttribute', 'setAttribute', 'pathname', 'queryParam', 'getSession'
     ],
     responseAttributes = [
-        'sendError', 'outputStaticResource', 'zipOutputStaticResource', 'zipOutputContent', 'outputFile'
+        'sendError', 'outputStaticResource', 'zipOutputStaticResource', 'zipOutputContent', 'outputFile','outputContent'
     ];
 function freeze(chain, request, response) {
 

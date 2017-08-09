@@ -104,12 +104,16 @@ function outputFile(pathname, acceptEncoding) {
         _.sendError(404, '404 error not found resource ');
     }
 }
-function getAttribute(name) {
-    return this.requestCache[name];
+function getAttribute(requestCache) {
+    return function (name) {
+        return requestCache[name];
+    };
 }
-function setAttribute(name, value) {
-    this.requestCache[name] = value;
-    return this;
+function setAttribute(requestCache) {
+    return function (name, value) {
+        requestCache[name] = value;
+        return this;
+    }
 }
 function extendRequestResponse(request, response) {
 
@@ -119,9 +123,10 @@ function extendRequestResponse(request, response) {
     response.zipOutputContent = zipOutputContent;
     response.outputContent = outputContent;
     response.outputFile = outputFile;
-    request.requestCache = {};
-    request.getAttribute = getAttribute;
-    request.setAttribute = setAttribute;
+
+    var requestCache = {};
+    request.getAttribute = getAttribute(requestCache);
+    request.setAttribute = setAttribute(requestCache);
 }
 function getMime(absPath) {
     var mime = MIME.lookup(PATH.basename(absPath));

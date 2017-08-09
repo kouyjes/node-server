@@ -1,6 +1,8 @@
 'use strict';
 const serverLogger = require('../logger/server-logger'),
     logger = serverLogger.getAppLogger();
+const Request = require('./Request'),
+    Response = require('./Response');
 const serverProcess = require('./server-process');
 const util = require('./../util/util');
 const assert = require('assert'), clone = require('clone');
@@ -71,11 +73,12 @@ function init(config) {
 
 
 }
+const requestMappingPath = './../mapping/request-mapping';
 function initHttp(config) {
 
-    util.freeze(config);
+    config = util.freeze(config);
+    const requestMapping = util.freeze(require(requestMappingPath)(config));
     const port = config.port;
-    const requestMapping = require('./../mapping/request-mapping')(config);
     const server = http.createServer(function (req, resp) {
         let params = [req, resp, config, requestMapping];
         requestListener.apply(this, params);
@@ -86,7 +89,7 @@ function initHttps(config) {
 
     util.freeze(config);
     const port = config.port;
-    const requestMapping = require('./../mapping/request-mapping')(config);
+    const requestMapping = util.freeze(require(requestMappingPath)(config));
     if (!config.key || !config.cert) {
         throw new TypeError('cert and key field must be config when protocol is https !');
     }
@@ -123,6 +126,17 @@ class FilterChain {
     }
 
     next() {
+        var params = Array.prototype.slice.call(arguments);
+        if(params.length > 0){
+            params.forEach((param) => {
+                if(param instanceof Request){
+                    this.filterArgs[0] = param;
+                }
+                if(param instanceof Response){
+                    this.filterArgs[1] = param;
+                }
+            });
+        }
         if (this.index.count > this.filters.length - 1) {
             if (typeof this.finishCallback === 'function') {
                 this.finishCallback.apply(null, this.filterArgs);
@@ -130,32 +144,52 @@ class FilterChain {
             return;
         }
         var filter = this.filters[this.index.count++];
-        var isInternal = filter.isInternal;
-        var args = isInternal ? this.filterArgs : this.filterArgs.slice(0, this.filterArgs.length - 1);
-        try {
-            filter.apply(null, [this].concat(args));
-        } catch (e) {
-            let response = this.filterArgs[1];
-            response.sendError && response.sendError(500, 'server internal error!');
-            logger.error(e);
-        }
+        var args = this.filterArgs;
+
+        filter.apply(null, [this].concat(args));
     }
 }
 function requestListener(request, response, config, requestMapping) {
 
     logger.info('request', request.url);
 
+    request = Request.create(request);
+    response = Response.create(response);
+
     response.getContextConfig = request.getContextConfig = function () {
         return config;
     };
+    request.getRequestMapping = function () {
+        return requestMapping;
+    };
+
 
     //execute filters interrupt if return false
-    var filters = requestMapping.getInternalFilters();
-    filters = filters.concat(requestMapping.getMatchedUserFilters(request.url));
-    filters = filters.concat(requestMapping.getInternalDispatchers());;
-    const args = [request, response, requestMapping];
-    const filterChain = new FilterChain(filters, args);
-    filterChain.next();
+    var internalFilters = requestMapping.getInternalFilters();
+    var userFilters = requestMapping.getMatchedUserFilters(request.url);
+    var dispatchers = requestMapping.getInternalDispatchers();
+    var args = [request, response];
+
+    var userFilterChain = new FilterChain(userFilters,args)
+    var dispatchChain = new FilterChain(dispatchers,args);
+    const internalFilterChain = new FilterChain(internalFilters, args);
+    internalFilterChain.finishCallback = function () {
+        userFilterChain.next();
+    };
+    userFilterChain.finishCallback = function () {
+        dispatchChain.next();
+    };
+    try{
+        internalFilterChain.next();
+    }catch(e){
+        if(response.sendError){
+            response.sendError(500, 'server internal error!');
+        }else{
+            response.end();
+        }
+        logger.error(e);
+    }
+
 
 }
 

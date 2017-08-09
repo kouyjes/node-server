@@ -1,5 +1,6 @@
 const logger = require('../logger/server-logger').getAppLogger();
-function execute(chain, request, response, requestMapping) {
+function execute(chain, request, response) {
+    const requestMapping = request.getRequestMapping();
     const handlerInfo = requestMapping.getMatchedRequestHandler(request.pathname);
     if (handlerInfo) {
         try {

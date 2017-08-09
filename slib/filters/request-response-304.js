@@ -65,6 +65,7 @@ function process_304(chain,request,response){
         }
         outputFile.apply(response,arguments);
     };
+
     chain.next();
 }
 process_304.priority = 99;
