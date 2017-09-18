@@ -71,7 +71,16 @@ class ParamUrlMapping{
     matchMethod(mapPath){
         var pathRoute = this.pathRoute;
         var paths = mapPath.split(/\//);
-        var method = null,pathParams = {};
+        var method = this.pathMapping[mapPath],pathParams = {};
+
+        if(method){
+            Object.freeze(pathParams);
+            return {
+                method:method,
+                pathParams:pathParams
+            };
+        }
+
         paths.some(function (path) {
             if(!path){
                 return;
@@ -107,10 +116,7 @@ class ParamUrlMapping{
             }
         });
         if(!method){
-            method = this.pathMapping[mapPath];
-        }
-        if(!method){
-            return;
+            return null;
         }
         Object.freeze(pathParams);
         return {
