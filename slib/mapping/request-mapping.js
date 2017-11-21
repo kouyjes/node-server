@@ -32,9 +32,8 @@ class RequestMapping {
         return this.mapping.userFilters;
     }
 
-    getMatchedRequestHandler(pathInfo) {
-
-        var methodInfo = this.mapping.paramUrlMapping.matchMethod(pathInfo);
+    getMatchedRequestHandler(request) {
+        var methodInfo = this.mapping.paramUrlMapping.matchMethod(request);
         return methodInfo;
     }
 

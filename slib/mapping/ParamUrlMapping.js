@@ -24,7 +24,7 @@ class ParamUrlMapping{
         this.pathRoute = new PathRoute();
         this.pathMapping = {};
     }
-    _mappError(mapPath){
+    _mapError(mapPath){
         const errorInfo = mapPath + ' mapping has exists!';
         logger.info(errorInfo);
         throw new EvalError(errorInfo);
@@ -60,7 +60,7 @@ class ParamUrlMapping{
         }else{
             let mapping = this.pathMapping;
             if(mapping[mapPath]){
-                this._mappError(mapPath);
+                this._mapError(mapPath);
             }
             mapping[mapPath] = method;
         }
@@ -68,12 +68,35 @@ class ParamUrlMapping{
         logger.info('mapping:' + mapPath);
 
     }
-    matchMethod(mapPath){
+    isHttpMethodMatch(request,ctrlMethod){
+        if(!ctrlMethod){
+            return false;
+        }
+        var allowMethods = ctrlMethod['$methods'] || [];
+        if(!Array.isArray(allowMethods)){
+            allowMethods = [].concat(allowMethods);
+        }
+        if(allowMethods.length === 0){
+            return true;
+        }
+        var METHOD = request.method.toUpperCase();
+        return allowMethods.some(function (m) {
+            if(typeof m !== 'string'){
+                return;
+            }
+            return m.toUpperCase() === METHOD;
+        });
+    }
+    matchMethod(request){
+
+        var _this = this;
+        var mapPath = request.pathname;
         var pathRoute = this.pathRoute;
         var paths = mapPath.split(/\//);
         var method = this.pathMapping[mapPath],pathParams = {};
 
-        if(method){
+        if(this.isHttpMethodMatch(request,method)){
+            let $methods = method['$methods'] || [];
             Object.freeze(pathParams);
             return {
                 method:method,
@@ -104,8 +127,10 @@ class ParamUrlMapping{
                         pathParams[varName] = decodeURI(key);
                     }
                 });
-                method = m;
-                return true;
+                if(_this.isHttpMethodMatch(request,m)){
+                    method = m;
+                    return true;
+                }
             });
             if(method){
                 return true;

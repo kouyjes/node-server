@@ -1,7 +1,7 @@
 const logger = require('../logger/server-logger').getAppLogger();
 function execute(chain, request, response) {
     const requestMapping = request.getRequestMapping();
-    const handlerInfo = requestMapping.getMatchedRequestHandler(request.pathname);
+    const handlerInfo = requestMapping.getMatchedRequestHandler(request);
     if (handlerInfo) {
         try {
             Object.defineProperty(request, 'pathParams', {
