@@ -27,11 +27,18 @@
             "path": null,
             "anonymous": false,
             "port": [
-                7771
+                8080
             ],
             "session": false,
             "attributes": {},
-            "proxy": null,
+            "proxy": {
+                "pathRule": "^/api",
+                "server": "192.168.50.41",
+                "port": 7000,
+                "headers": {
+                    "token": "dataarch-kkk"
+                }
+            },
             "multiCpuSupport": false
         }
     ],

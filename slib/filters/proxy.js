@@ -18,13 +18,13 @@ function proxy(chain,request,response){
         chain.next();
         return;
     }
-
+    var proxyHeaders = proxy.headers || {};
     var options = {
         hostname: proxy.server,
         port: proxy.port || config.port,
         path: reqUrl,
         method: request.method,
-        headers: request.headers
+        headers: Object.assign(request.headers,proxyHeaders)
     };
 
     var proxyClient = http;
@@ -44,8 +44,7 @@ function proxy(chain,request,response){
     }
 
     var proxyRequest = proxyClient.request(options, function (res) {
-        proxy.headers && Object.assign(res.headers || {},proxy.headers);
-        response.writeHead(res.statusCode,res.headers);
+        response.writeHead(res.statusCode,res.headers || {});
         res.on('data', function (data) {
             response.write(data);
         }).on('end', function () {
