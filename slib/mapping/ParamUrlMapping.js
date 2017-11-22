@@ -16,6 +16,8 @@ class PathRoute{
         return route;
     }
 }
+const METHOD_REG = '$urlRegExp';
+const METHOD = '$methods';
 class ParamUrlMapping{
     static isContainPathParam(mapPath){
         return pathParamReg.test(mapPath);
@@ -46,7 +48,11 @@ class ParamUrlMapping{
                     });
                     regPath = '^' + regPath + '$';
                     method.pathVariables = paramNames;
-                    method.urlRegExp = new RegExp(regPath);
+                    var urlRegExp = method[METHOD_REG];
+                    if(!Array.isArray(urlRegExp)){
+                        urlRegExp = method[METHOD_REG] = [];
+                    }
+                    urlRegExp.push(new RegExp(regPath));
                     pathRoute.methods.push(method);
                     return true;
                 }
@@ -72,19 +78,19 @@ class ParamUrlMapping{
         if(!ctrlMethod){
             return false;
         }
-        var allowMethods = ctrlMethod['$methods'] || [];
+        var allowMethods = ctrlMethod[METHOD] || [];
         if(!Array.isArray(allowMethods)){
             allowMethods = [].concat(allowMethods);
         }
         if(allowMethods.length === 0){
             return true;
         }
-        var METHOD = request.method.toUpperCase();
+        var _METHOD = request.method.toUpperCase();
         return allowMethods.some(function (m) {
             if(typeof m !== 'string'){
                 return;
             }
-            return m.toUpperCase() === METHOD;
+            return m.toUpperCase() === _METHOD;
         });
     }
     matchMethod(request){
@@ -96,7 +102,6 @@ class ParamUrlMapping{
         var method = this.pathMapping[mapPath],pathParams = {};
 
         if(this.isHttpMethodMatch(request,method)){
-            let $methods = method['$methods'] || [];
             Object.freeze(pathParams);
             return {
                 method:method,
@@ -109,7 +114,12 @@ class ParamUrlMapping{
                 return;
             }
             pathRoute.methods.some(function (m) {
-                var match = mapPath.match(m.urlRegExp);
+                var urlRegExp = m[METHOD_REG] || [];
+                var match = null;
+                urlRegExp.some(function (regExp) {
+                    match = mapPath.match(regExp);
+                    return !!match;
+                });
                 if(!match){
                     return;
                 }

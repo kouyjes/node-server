@@ -18,7 +18,11 @@
                     "dir": "e:/opt/deepclue/webapp-taiwan/node_modules"
                 },
                 {
-                    "path": "/api",
+                    "path": "/api/eyes-tw",
+                    "dir": "e:/opt/deepclue/webapp-taiwan/mock"
+                },
+                {
+                    "path": "/api/bolt",
                     "dir": "e:/opt/deepclue/webapp-taiwan/mock"
                 }
             ],
@@ -31,14 +35,7 @@
             ],
             "session": false,
             "attributes": {},
-            "proxy": {
-                "pathRule": "^/api",
-                "server": "192.168.50.41",
-                "port": 7000,
-                "headers": {
-                    "token": "dataarch-kkk"
-                }
-            },
+            "proxy": null,
             "multiCpuSupport": false
         }
     ],
