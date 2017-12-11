@@ -4,17 +4,30 @@ const http = require('http'),
 function proxy(chain,request,response){
 
     const config = request.getContextConfig();
-    var proxy = config.proxy;
+    var _proxy = config.proxy;
     var reqUrl = request.url;
-    if(proxy && proxy instanceof Array){
-        proxy.some(function (p) {
-            if(p.pathRule && p.pathRule.test(reqUrl)){
-                proxy = p;
-                return true;
-            }
-        });
+    var proxies = [];
+
+    if(_proxy instanceof Array){
+        proxies = _proxy;
+    }else if(_proxy){
+        proxies.push(_proxy);
     }
-    if(!proxy || !proxy.pathRule || !proxy.server || !reqUrl.match(new RegExp(proxy.pathRule))){
+    var proxy = null;
+    proxies.some(function (p) {
+        var pathRule = p.pathRule;
+        if(typeof pathRule === 'string'){
+            pathRule = new RegExp(pathRule);
+        }
+        if(!(pathRule instanceof RegExp)){
+            return;
+        }
+        if(pathRule && pathRule.test(reqUrl)){
+            proxy = p;
+            return true;
+        }
+    });
+    if(!proxy || !proxy.server){
         chain.next();
         return;
     }
@@ -22,7 +35,7 @@ function proxy(chain,request,response){
     var options = {
         hostname: proxy.server,
         port: proxy.port || config.port,
-        path: reqUrl,
+        path: proxy.url || reqUrl,
         method: request.method,
         headers: Object.assign(request.headers,proxyHeaders)
     };
