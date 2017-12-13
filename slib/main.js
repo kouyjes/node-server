@@ -44,7 +44,7 @@ function startServer(config) {
                 return;
             }
 
-            const appFile = path.resolve(__dirname, 'server-node.js');
+            const appFile = path.resolve(__dirname, 'core/server-node.js');
             const params = [appFile];
             params.push('--config');
             params.push(Buffer.from(JSON.stringify(app.config)).toString('base64'));
