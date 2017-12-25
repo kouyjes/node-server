@@ -8,16 +8,19 @@ const util = require('./../util/util');
 const assert = require('assert'), clone = require('clone');
 const cluster = require('cluster');
 const cpuNum = require('os').cpus().length;
-const http = require('http'),
-    https = require('https');
-
+const http = require('http');
+const https = require('https');
+const http2Getter = function () {
+    return require('http2');
+};
 const fs = require('fs');
 
 const isMasterProcess = module.parent ? false : true;
 
 const initFunctions = {
     http: initHttp,
-    https: initHttps
+    https: initHttps,
+    http2:initHttp2
 };
 function extractCommand() {
     const comParams = process.argv.slice(1);
@@ -104,6 +107,31 @@ function initHttps(config) {
         cert: fs.readFileSync(config.cert)
     };
     const server = https.createServer(option, function (req, resp) {
+        let params = [req, resp, config, requestMapping];
+        requestListener.apply(this, params);
+    });
+    server.listen(port);
+}
+function initHttp2(config){
+    util.freeze(config);
+    const port = config.port;
+    const requestMapping = util.freeze(require(requestMappingPath)(config));
+    if (!config.key || !config.cert) {
+        throw new TypeError('cert and key field must be config when protocol is http2 !');
+    }
+    if (!fs.existsSync(config.key)) {
+        throw new TypeError('key file is not exist ! ' + config.key);
+    }
+    if (!fs.existsSync(config.cert)) {
+        throw new TypeError('cert file is not exist ! ' + config.cert);
+    }
+    const option = {
+        key: fs.readFileSync(config.key),
+        cert: fs.readFileSync(config.cert),
+        allowHTTP1:true
+    };
+    var http2 = http2Getter();
+    const server = http2.createServer(option, function (req, resp) {
         let params = [req, resp, config, requestMapping];
         requestListener.apply(this, params);
     });

@@ -1,6 +1,12 @@
+var _http2;
+try{
+    _http2 = require('http2');
+}catch(e){
+}
 const http = require('http'),
     https = require('https'),
     fs = require('fs');
+const http2 = _http2;
 function proxy(chain,request,response){
 
     const config = request.getContextConfig();
@@ -39,9 +45,12 @@ function proxy(chain,request,response){
         method: request.method,
         headers: Object.assign(request.headers,proxyHeaders)
     };
+    if(!proxy.protocol){
+        proxy.protocol = config.protocol || 'http';
+    }
 
     var proxyClient = http;
-    if(proxy.protocol === 'https'){
+    function checkKeyCert(){
         if(!proxy.key || !proxy.cert){
             throw new TypeError('cert and key field must be config when protocol is https !');
         }
@@ -53,6 +62,12 @@ function proxy(chain,request,response){
         }
         options.key = fs.readFileSync(proxy.key);
         options.cert = fs.readFileSync(proxy.cert);
+    }
+    if(proxy.protocol === 'https' || proxy.protocol === 'http2'){
+        checkKeyCert();
+        if(typeof proxy.rejectUnauthorized === 'boolean'){
+            options.rejectUnauthorized = proxy.rejectUnauthorized;
+        }
         proxyClient = https;
     }
 
