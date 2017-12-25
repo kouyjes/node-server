@@ -144,7 +144,13 @@ function wrapperRequestResponse(chain, request, response) {
     }
     response.setHeader('Server', config.serverName);
     const urlInfo = URL.parse(request.url);
-    request.pathname = urlInfo.pathname;
+    var pathname = PATH.normalize(urlInfo.pathname);
+    pathname = pathname.replace(/\\/g,'/');
+    request.pathname = pathname;
+
+    if(urlInfo.pathname !== request.pathname){
+        console.error('invalid request path :' + urlInfo.pathname);
+    }
     var queryParam = request.queryParam = {};
     var query = urlInfo.query;
     query && query.split('&').forEach(function (querySection) {
