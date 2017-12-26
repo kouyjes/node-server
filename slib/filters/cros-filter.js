@@ -28,5 +28,5 @@ function configCROS(chain, request, response) {
     }
     chain.next();
 }
-configCROS.priority = 11;
+configCROS.priority = 101;
 exports.execute = configCROS;
