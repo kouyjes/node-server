@@ -88,11 +88,7 @@ function initHttp(config) {
     });
     server.listen(port);
 }
-function initHttps(config) {
-
-    util.freeze(config);
-    const port = config.port;
-    const requestMapping = util.freeze(require(requestMappingPath)(config));
+function checkKeyCert(config) {
     if (!config.key || !config.cert) {
         throw new TypeError('cert and key field must be config when protocol is https !');
     }
@@ -102,6 +98,13 @@ function initHttps(config) {
     if (!fs.existsSync(config.cert)) {
         throw new TypeError('cert file is not exist ! ' + config.cert);
     }
+}
+function initHttps(config) {
+
+    util.freeze(config);
+    const port = config.port;
+    const requestMapping = util.freeze(require(requestMappingPath)(config));
+    checkKeyCert(config);
     const option = {
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert)
@@ -116,22 +119,14 @@ function initHttp2(config){
     util.freeze(config);
     const port = config.port;
     const requestMapping = util.freeze(require(requestMappingPath)(config));
-    if (!config.key || !config.cert) {
-        throw new TypeError('cert and key field must be config when protocol is http2 !');
-    }
-    if (!fs.existsSync(config.key)) {
-        throw new TypeError('key file is not exist ! ' + config.key);
-    }
-    if (!fs.existsSync(config.cert)) {
-        throw new TypeError('cert file is not exist ! ' + config.cert);
-    }
+    checkKeyCert(config);
     const option = {
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert),
         allowHTTP1:true
     };
     var http2 = http2Getter();
-    const server = http2.createServer(option, function (req, resp) {
+    const server = http2['createSecureServer'](option, function (req, resp) {
         let params = [req, resp, config, requestMapping];
         requestListener.apply(this, params);
     });

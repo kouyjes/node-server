@@ -33,13 +33,13 @@ function proxy(chain,request,response){
             return true;
         }
     });
-    if(!proxy || !proxy.server){
+    if(!proxy){
         chain.next();
         return;
     }
     var proxyHeaders = proxy.headers || {};
     var options = {
-        hostname: proxy.server,
+        hostname: proxy.server || '127.0.0.1',
         port: proxy.port || config.port,
         path: proxy.url || reqUrl,
         method: request.method,
@@ -48,11 +48,17 @@ function proxy(chain,request,response){
     if(!proxy.protocol){
         proxy.protocol = config.protocol || 'http';
     }
-
+    var isSameProtocol = proxy.protocol === config.protocol,
+        isSamePort = options.port === config.port;
+    if(isSameProtocol && isSamePort && (!options.hostname || ['localhost','127.0.0.1'].indexOf(options.hostname) >= 0)){
+        request.redirectUrl(options.path);
+        chain.next();
+        return;
+    }
     var proxyClient = http;
     function checkKeyCert(){
         if(!proxy.key || !proxy.cert){
-            throw new TypeError('cert and key field must be config when protocol is https !');
+            throw new TypeError('cert and key field must be config when protocol is https or http2!');
         }
         if(!fs.existsSync(proxy.key)){
             throw new TypeError('key file is not exist ! ' + proxy.key);
@@ -63,12 +69,15 @@ function proxy(chain,request,response){
         options.key = fs.readFileSync(proxy.key);
         options.cert = fs.readFileSync(proxy.cert);
     }
-    if(proxy.protocol === 'https' || proxy.protocol === 'http2'){
+    if(proxy.protocol === 'https'){
         checkKeyCert();
         if(typeof proxy.rejectUnauthorized === 'boolean'){
             options.rejectUnauthorized = proxy.rejectUnauthorized;
         }
         proxyClient = https;
+    }else if(proxy.protocol === 'http2'){
+        response.sendError(500,'protocol http2 proxy not supported !');
+        return;
     }
 
     var proxyRequest = proxyClient.request(options, function (res) {
