@@ -56,21 +56,16 @@ function proxy(chain,request,response){
         return;
     }
     var proxyClient = http;
-    function checkKeyCert(){
-        if(!proxy.key || !proxy.cert){
-            throw new TypeError('cert and key field must be config when protocol is https or http2!');
+    function configKeyCert(){
+        if(proxy.key && fs.existsSync(proxy.key)){
+            options.key = fs.readFileSync(proxy.key);
         }
-        if(!fs.existsSync(proxy.key)){
-            throw new TypeError('key file is not exist ! ' + proxy.key);
+        if(proxy.cert && fs.existsSync(proxy.cert)){
+            options.cert = fs.readFileSync(proxy.cert);
         }
-        if(!fs.existsSync(proxy.cert)){
-            throw new TypeError('cert file is not exist ! ' + proxy.cert);
-        }
-        options.key = fs.readFileSync(proxy.key);
-        options.cert = fs.readFileSync(proxy.cert);
     }
     if(proxy.protocol === 'https'){
-        checkKeyCert();
+        configKeyCert();
         if(typeof proxy.rejectUnauthorized === 'boolean'){
             options.rejectUnauthorized = proxy.rejectUnauthorized;
         }
