@@ -7,54 +7,28 @@ const http = require('http'),
     https = require('https'),
     fs = require('fs');
 const http2 = _http2;
+const proxyUtil = require('./proxyUtil');
 function proxy(chain,request,response){
 
     const config = request.getContextConfig();
-    var _proxy = config.proxy;
-    var reqUrl = request.url;
-    var proxies = [];
 
-    if(_proxy instanceof Array){
-        proxies = _proxy;
-    }else if(_proxy){
-        proxies.push(_proxy);
-    }
-    var proxy = null;
-    proxies.some(function (p) {
-        var pathRule = p.pathRule;
-        if(typeof pathRule === 'string'){
-            pathRule = new RegExp(pathRule);
-        }
-        if(!(pathRule instanceof RegExp)){
-            return;
-        }
-        if(pathRule && pathRule.test(reqUrl)){
-            proxy = p;
-            return true;
-        }
-    });
-    if(!proxy){
+    if(config.protocol !== 'http2'){
         chain.next();
         return;
     }
-    var proxyHeaders = proxy.headers || {};
+    var proxy = proxyUtil.matchProxy(request);
+    if(!proxy || ['http','https'].indexOf(proxy.protocol) === -1){
+        chain.next();
+        return;
+    }
+
     var options = {
-        hostname: proxy.server || '127.0.0.1',
-        port: proxy.port || config.port,
-        path: proxy.url || reqUrl,
+        hostname: proxy.server,
+        port: proxy.port,
+        path: proxy.url,
         method: request.method,
-        headers: Object.assign(request.headers,proxyHeaders)
+        headers: Object.assign(request.headers,proxy.headers)
     };
-    if(!proxy.protocol){
-        proxy.protocol = config.protocol || 'http';
-    }
-    var isSameProtocol = proxy.protocol === config.protocol,
-        isSamePort = options.port === config.port;
-    if(isSameProtocol && isSamePort && (!options.hostname || ['localhost','127.0.0.1'].indexOf(options.hostname) >= 0)){
-        request.redirectUrl(options.path);
-        chain.next();
-        return;
-    }
     var proxyClient = http;
     function configKeyCert(){
         if(proxy.key && fs.existsSync(proxy.key)){
@@ -68,18 +42,37 @@ function proxy(chain,request,response){
         configKeyCert();
         if(typeof proxy.rejectUnauthorized === 'boolean'){
             options.rejectUnauthorized = proxy.rejectUnauthorized;
+        }else{
+            options.rejectUnauthorized = false;
         }
         proxyClient = https;
-    }else if(proxy.protocol === 'http2'){
-        response.sendError(500,'protocol http2 proxy not supported !');
-        return;
     }
-
+    if(config.protocol === 'http2'){
+        var headers = {};
+        Object.keys(options.headers).map(function (headerName) {
+            var _headerName = headerName.replace(/^:/,'');
+            headers[_headerName] = options.headers[headerName];
+        });
+        options.headers = headers;
+    }
     var proxyRequest = proxyClient.request(options, function (res) {
-        response.writeHead(res.statusCode,res.headers || {});
+        if(response.finished){
+            return;
+        }
+        var headers = Object.assign({},res.headers);
+        ['connection','method','path','transfer-encoding'].forEach(function (key) {
+            delete headers[key];
+        });
+        response.writeHead(res.statusCode,headers);
         res.on('data', function (data) {
+            if(response.finished){
+               return;
+            }
             response.write(data);
         }).on('end', function () {
+            if(response.finished){
+                return;
+            }
             response.end();
         });
     }).on('error', function (e) {
@@ -90,6 +83,9 @@ function proxy(chain,request,response){
     });
     if(typeof proxy.timeout === 'number'){
         proxyRequest.setTimeout(proxy.timeout, function () {
+            if(response.finished){
+                return;
+            }
             response.sendError(500,'proxy request timeout! IP:' + options.hostname + ' PORT:' + options.port);
             proxyRequest.abort();
         });

@@ -68,5 +68,5 @@ function process_304(chain,request,response){
 
     chain.next();
 }
-process_304.priority = 99;
+process_304.priority = 80;
 exports.execute = process_304;
