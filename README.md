@@ -1,9 +1,167 @@
 # node-server
-node-server is a http server,a proxy server
-### Get Starting
-First add a config file in conf directory for node=server,the config demo is in the same directory
+node-server是一个用node实现的web服务器，支持基本的反向代理、node开发后端应用。
 
-####  node-server 配置说明
+### node
+### Get Starting
+### 配置文件
+node-server的配置文件位于conf目录下，是一个正常的node模块，config.demo.js为config的配置说明。
+
+### 静态资源服务器配置
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                path:'/', //配置
+                docBase:[
+                    '/workspace' //配置静态资源目录绝对地址
+                    //{dir:'/workspace'} //以对象方式定义docBase
+                    //{dir:'/workspace',path:'/work'} 定义每个工作目录的path
+                ],
+                port:8080
+                //port:[8080,8081]
+            }
+        ]
+    };
+```
+
+### 代理服务器配置
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                proxy:{
+                    protocol:null,
+                    pathRule:'^/api',
+                    server:'192.168.1.100',
+                    port:80,
+                    headers:{}
+                }
+            }
+        ]
+    };
+```
+proxy:配置代理，为一个对象或是数组，如配置为数组，则会根据顺序选择满足pathRule规则的代理。
+protocol:定义代理的协议，默认与请求协议一致
+pathRule:配置代理的代理规则，为一个正则字符串,如：'^/api'
+server:配置代理服务器IP
+port:配置代理服务器端口，默认与请求端口一致
+headers:配置发送到代理服务器需要添加的header
+
+
+### 会话配置
+node-server会话默认是关闭的，当session配置有效时会启用会话，会话存储默认提供2中方式，文件会话存储于redis会话存储。
+
+#### 文件会话存储
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                session:{
+                    provider:{
+                        type:'file',
+                        dataFile:'/data/log/session.data'
+                    },
+                    timeout:30
+                }
+            }
+        ]
+    };
+```
+provider:会话提供者
+type:配置会话持久化类型
+dataFile:配置会话存储的文件，实际情况会话文件后会附加相关的上下文信息
+timeout:配置会话有效期，单位为分
+
+#### redis会话存储
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                session:{
+                    provider:{
+                        type:'redis',
+                        host:'127.0.0.1',
+                        port:7050,
+                        password:''
+                    },
+                    timeout:30
+                }
+            }
+        ]
+    };
+```
+host:配置redis主机地址
+port:配置redis端口
+password:配置redis连接密码
+
+#### 会话提供方式扩展
+如果两种会话方式不满足实际需求，可对会话提供方式进行扩展，会话实现需要继承抽象类Session，会话提供者需要实现抽象类SessionProvider，然后在session/impl.json
+中进行配置即可。
+
+
+### server的协议支持
+node-server协议类型支持http|h2|https
+
+#### http
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                protocol:'http'
+            }
+        ]
+    };
+```
+protocol:定义协议类型，默认是http协议
+
+#### https
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                protocol:'https',
+                key:filePath.resolve('conf/private.pem'),
+                cert:filePath.resolve('conf/file.crt')
+            }
+        ]
+    };
+```
+https协议需要配置私钥与证书路径
+
+#### http2
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                protocol:'h2',
+                key:filePath.resolve('conf/private.pem'),
+                cert:filePath.resolve('conf/file.crt')
+            }
+        ]
+    };
+```
+
+### 配置上下文属性
+```javascript
+    exports.config = {
+        contexts:[
+            {
+                ...
+                attributes:{anonymous:false}
+            }
+        ]
+    };
+```
+attributes:定义上下文属性，可以通过config对象获取
+
+
+####  node-server 完整配置说明
 ```javascript
 /**
  *
@@ -69,8 +227,25 @@ config = {
   ]
 };
 ```
-### Develop with node-server
-#### Define filter in filters directory of same path which config.js defines
+
+### node-server实现原理
+对于每个context会启动一个node子进程，每个进程是相对独立的。
+node-server包含很多filter与dispatcher，每个filter负责不同的职责以及对request的加工。
+#### 内置filter
+request-response-wrapper 实现常用的接口调用
+request-session-wrapper 负责session部分
+request-cookie-wrapper 负责cookie部分
+request-response-304 负责缓存部分
+cros-filter 负责一些跨域请求的处理
+proxy-* 负责代理
+
+#### 内置dispatcher
+ControllerDispatcher 负责用户node程序接口的调用
+StaticResourceDispatcher 静态资源转发
+
+#### 用户filter定义
+node-server默认会解析用户工作目录下filters目录，并解析目录中js文件的filter
+
 ```javascript
     function loginFilter(chain,request,response){
         //todo
@@ -79,7 +254,15 @@ config = {
     loginFilter.priority = 1; //[optional]
     exports.execute = loginFilter
 ```
-#### Define controller in controllers directory
+filter文件是一个node模块，包含execute方法则被视为有效的filter，execute方法调用时会传入3个参数。
+chain:filter链，每个filter执行后需调用chain.next()将请求移交给下一个filter，如不需要移交，则不需要调用。
+request:代表请求对象
+response：代表响应对象
+priority:filter的优先级，默认为0，系统内置的filter调用优先于用户定义的filter
+
+
+
+###  Controller定义
 ```javascript
     function getUsers(request,response){
         var users = [];
@@ -87,9 +270,9 @@ config = {
         response.outputContent('application/json',result);
     }
     exports.users = getUsers;
-    
+
     //request url http://localhost/users
-    
+
     //you can also change default url mapping rule
     function getBooks(request response){
         var pathParams = request.pathParams;
@@ -102,4 +285,32 @@ config = {
     exports.books = getBooks;
     //request url http://localhost/users/123
 ```
+server启动时会扫描用户工作目录下的controllers目录以及子目录js文件
+每个controller也是一个node模块，exports中的每个方法对应controller的一个接口
+function的$mappingUrl属性定义接口的url，没有此属性时，server会根据目录的层次生成默认的接口url
+function的$methods定义接口调用允许的http METHOD,为数组或字符串
+
+### API
+Request
+getContextConfig() 获取上下文配置
+getAttribute(key) 返回属性
+setAttribute(key,value)设置属性
+getCookie(name) 获取Cookie
+getSession() 获取session对象
+
+Session
+setAttributes(property)设置属性
+getAttribute(name,async)获取属性
+invalid()
+getId()
+
+Response
+addCookie(cookie) 添加Cookie
+outputContent(content,mime)输出内容
+zipOutputContent(mime,content,encoding)压缩输出内容
+sendError(errorCode,message) 输出错误响应
+outputStaticResource(absPath)根据路径输出资源内容
+zipOutputStaticResource(absPath,encoding)根据路径压缩输出资源内容
+
+
 

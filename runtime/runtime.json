@@ -1,29 +1,29 @@
 {
     "contexts": [
         {
-            "serverName": "web server",
+            "serverName": "web app server",
             "debugMode": false,
             "protocol": "http",
-            "key": null,
-            "cert": null,
-            "zipResponse": false,
-            "disabledAgentCache": true,
+            "key": "F:\\source\\node-server\\conf\\private.pem",
+            "cert": "F:\\source\\node-server\\conf\\file.crt",
+            "zipResponse": true,
+            "disabledAgentCache": false,
             "docBase": [
                 {
                     "path": "/",
-                    "dir": "e:/opt/deepclue/webapp-taiwan/src"
+                    "dir": "f:/source/webapp/cli2/vue-template/src"
                 },
                 {
                     "path": "/node_modules",
-                    "dir": "e:/opt/deepclue/webapp-taiwan/node_modules"
+                    "dir": "f:/source/webapp/cli2/vue-template/src/node_modules"
                 },
                 {
-                    "path": "/api/eyes-tw",
-                    "dir": "e:/opt/deepclue/webapp-taiwan/mock"
+                    "path": "/api",
+                    "dir": "f:/source/webapp/cli2/vue-template/mock"
                 },
                 {
-                    "path": "/api/bolt",
-                    "dir": "e:/opt/deepclue/webapp-taiwan/mock"
+                    "path": "/",
+                    "dir": "f:/source/webapp/cli2/vue-template/build"
                 }
             ],
             "sessionCookieName": "x3_session",
@@ -35,9 +35,28 @@
             ],
             "session": false,
             "attributes": {},
-            "proxy": null,
+            "proxy": [
+                {
+                    "pathRule": "^/api",
+                    "server": "172.24.8.100",
+                    "port": 7000,
+                    "protocol": "http",
+                    "headers": {}
+                },
+                {
+                    "pathRule": "^(/targetSearch|/relGraph|/workspaces|/systemManage)",
+                    "server": "",
+                    "port": 8080,
+                    "protocol": "http2",
+                    "key": "F:\\source\\node-server\\conf\\private.pem",
+                    "cert": "F:\\source\\node-server\\conf\\file.crt",
+                    "rejectUnauthorized": false,
+                    "url": "/"
+                }
+            ],
             "multiCpuSupport": false
         }
     ],
+    "multiProcess": false,
     "debugMode": false
 }
