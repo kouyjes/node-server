@@ -311,6 +311,7 @@ Request<br/>
 getContextConfig() 获取上下文配置<br/>
 getAttribute(key) 返回属性<br/>
 setAttribute(key,value)设置属性<br/>
+createCookie(name,value) 创建Cookie，返回Cookie实例
 getCookie(name) 获取Cookie<br/>
 getSession() 获取session对象<br/><br/>
 
@@ -321,7 +322,9 @@ invalid()<br/>
 getId()<br/><br/>
 
 Response<br/>
+createCookie(name,value) 创建Cookie，返回Cookie实例<br/>
 addCookie(cookie) 添加Cookie<br/>
+removeCookie(name) 删除Cookie<br/>
 outputContent(content,mime)输出内容<br/>
 zipOutputContent(mime,content,encoding)压缩输出内容<br/>
 sendError(errorCode,message) 输出错误响应<br/>
