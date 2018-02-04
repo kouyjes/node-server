@@ -8,38 +8,38 @@ node-server的配置文件位于conf目录下，是一个正常的node模块，c
 
 ### 静态资源服务器配置
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                path:'/', //配置
-                docBase:[
-                    '/workspace' //配置静态资源目录绝对地址
-                    //{dir:'/workspace'} //以对象方式定义docBase
-                    //{dir:'/workspace',path:'/work'} 定义每个工作目录的path
-                ],
-                port:8080
-                //port:[8080,8081]
-            }
-        ]
-    };
+exports.config = {
+    contexts:[
+        {
+            path:'/', //配置
+            docBase:[
+                '/workspace' //配置静态资源目录绝对地址
+                //{dir:'/workspace'} //以对象方式定义docBase
+                //{dir:'/workspace',path:'/work'} 定义每个工作目录的path
+            ],
+            port:8080
+            //port:[8080,8081]
+        }
+    ]
+};
 ```
 
 ### 代理服务器配置
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                proxy:{
-                    protocol:null,
-                    pathRule:'^/api',
-                    server:'192.168.1.100',
-                    port:80,
-                    headers:{}
-                }
+exports.config = {
+    contexts:[
+        {
+            ...
+            proxy:{
+                protocol:null,
+                pathRule:'^/api',
+                server:'192.168.1.100',
+                port:80,
+                headers:{}
             }
-        ]
-    };
+        }
+    ]
+};
 ```
 proxy:配置代理，为一个对象或是数组，如配置为数组，则会根据顺序选择满足pathRule规则的代理。<br/>
 protocol:定义代理的协议，默认与请求协议一致 <br/>
@@ -54,20 +54,20 @@ node-server会话默认是关闭的，当session配置有效时会启用会话�
 
 #### 文件会话存储
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                session:{
-                    provider:{
-                        type:'file',
-                        dataFile:'/data/log/session.data'
-                    },
-                    timeout:30
-                }
+exports.config = {
+    contexts:[
+        {
+            ...
+            session:{
+                provider:{
+                    type:'file',
+                    dataFile:'/data/log/session.data'
+                },
+                timeout:30
             }
-        ]
-    };
+        }
+    ]
+};
 ```
 provider:会话提供者<br/>
 type:配置会话持久化类型<br/>
@@ -76,22 +76,22 @@ timeout:配置会话有效期，单位为分<br/>
 
 #### redis会话存储
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                session:{
-                    provider:{
-                        type:'redis',
-                        host:'127.0.0.1',
-                        port:7050,
-                        password:''
-                    },
-                    timeout:30
-                }
+exports.config = {
+    contexts:[
+        {
+            ...
+            session:{
+                provider:{
+                    type:'redis',
+                    host:'127.0.0.1',
+                    port:7050,
+                    password:''
+                },
+                timeout:30
             }
-        ]
-    };
+        }
+    ]
+};
 ```
 host:配置redis主机地址<br/>
 port:配置redis端口<br/>
@@ -107,56 +107,56 @@ node-server协议类型支持http|h2|https
 
 #### http
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                protocol:'http'
-            }
-        ]
-    };
+exports.config = {
+    contexts:[
+        {
+            ...
+            protocol:'http'
+        }
+    ]
+};
 ```
 protocol:定义协议类型，默认是http协议
 
 #### https
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                protocol:'https',
-                key:filePath.resolve('conf/private.pem'),
-                cert:filePath.resolve('conf/file.crt')
-            }
-        ]
-    };
+exports.config = {
+    contexts:[
+        {
+            ...
+            protocol:'https',
+            key:filePath.resolve('conf/private.pem'),
+            cert:filePath.resolve('conf/file.crt')
+        }
+    ]
+};
 ```
 https协议需要配置私钥与证书路径
 
 #### http2
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                protocol:'h2',
-                key:filePath.resolve('conf/private.pem'),
-                cert:filePath.resolve('conf/file.crt')
-            }
-        ]
-    };
+exports.config = {
+    contexts:[
+        {
+            ...
+            protocol:'h2',
+            key:filePath.resolve('conf/private.pem'),
+            cert:filePath.resolve('conf/file.crt')
+        }
+    ]
+};
 ```
 
 ### 配置上下文属性
 ```javascript
-    exports.config = {
-        contexts:[
-            {
-                ...
-                attributes:{anonymous:false}
-            }
-        ]
-    };
+exports.config = {
+    contexts:[
+        {
+            ...
+            attributes:{anonymous:false}
+        }
+    ]
+};
 ```
 attributes:定义上下文属性，可以通过config对象获取
 
@@ -247,12 +247,12 @@ StaticResourceDispatcher 静态资源转发<br/>
 node-server默认会解析用户工作目录下filters目录，并解析目录中js文件的filter
 
 ```javascript
-    function loginFilter(chain,request,response){
-        //todo
-        chain.next();
-    }
-    loginFilter.priority = 1; //[optional]
-    exports.execute = loginFilter
+function loginFilter(chain,request,response){
+    //todo
+    chain.next();
+}
+loginFilter.priority = 1; //[optional]
+exports.execute = loginFilter
 ```
 filter文件是一个node模块，包含execute方法则被视为有效的filter，execute方法调用时会传入3个参数。<br/>
 chain:filter链，每个filter执行后需调用chain.next()将请求移交给下一个filter，如不需要移交，则不需要调用。<br/>
@@ -264,26 +264,26 @@ priority:filter的优先级，默认为0，系统内置的filter调用优先于�
 
 ###  Controller定义
 ```javascript
-    function getUsers(request,response){
-        var users = [];
-        var result = JSON.stringify(users);
-        response.outputContent('application/json',result);
-    }
-    exports.users = getUsers;
+function getUsers(request,response){
+    var users = [];
+    var result = JSON.stringify(users);
+    response.outputContent(result,'application/json');
+}
+exports.users = getUsers;
 
-    //request url http://localhost/users
+//request url http://localhost/users
 
-    //you can also change default url mapping rule
-    function getBooks(request response){
-        var pathParams = request.pathParams;
-        var userId = pathParams.userId;
-        var books = [];
-        var result = JSON.stringify(books);
-        response.outputContent('application/json',result);
-    }
-    getBooks.$mappingUrl = '/users/{userId}'
-    exports.books = getBooks;
-    //request url http://localhost/users/123
+//you can also change default url mapping rule
+function getBooks(request response){
+    var pathParams = request.pathParams;
+    var userId = pathParams.userId;
+    var books = [];
+    var result = JSON.stringify(books);
+    response.outputContent(result,'application/json');
+}
+getBooks.$mappingUrl = '/users/{userId}'
+exports.books = getBooks;
+//request url http://localhost/users/123
 ```
 server启动时会扫描用户工作目录下的controllers目录以及子目录js文件
 
@@ -295,15 +295,15 @@ function的$methods定义接口调用允许的http METHOD,为数组或字符串<
 
 ### Node Api启动server
 ```javascript
-    var server = require('nm-web-server');
-    var config = {
-        contexts:[
-            {
-                ...
-            }
-        ]
-    };
-    server.startServer(config);
+var server = require('nm-web-server');
+var config = {
+    contexts:[
+        {
+            ...
+        }
+    ]
+};
+server.startServer(config);
 ```
 
 ### API
