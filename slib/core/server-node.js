@@ -54,9 +54,10 @@ function init(config) {
     }
 
     const protocol = config.protocol;
+    var processNum = config['processNum'] || cpuNum;
     if (isMasterProcess && config.multiCpuSupport) {
         if (cluster.isMaster) {
-            for (let i = 0; i < cpuNum; i++) {
+            for (let i = 0; i < processNum; i++) {
                 cluster.fork();
             }
             cluster.on('exit', function (oldWorker) {

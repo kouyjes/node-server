@@ -3,7 +3,7 @@
         {
             "serverName": "web app server",
             "debugMode": false,
-            "protocol": "http",
+            "protocol": "http2",
             "key": "F:\\source\\node-server\\conf\\private.pem",
             "cert": "F:\\source\\node-server\\conf\\file.crt",
             "zipResponse": true,
@@ -11,19 +11,7 @@
             "docBase": [
                 {
                     "path": "/",
-                    "dir": "f:/source/webapp/cli2/vue-template/src"
-                },
-                {
-                    "path": "/node_modules",
-                    "dir": "f:/source/webapp/cli2/vue-template/src/node_modules"
-                },
-                {
-                    "path": "/api",
-                    "dir": "f:/source/webapp/cli2/vue-template/mock"
-                },
-                {
-                    "path": "/",
-                    "dir": "f:/source/webapp/cli2/vue-template/build"
+                    "dir": "e:/opt/deepclue/webapp-taiwan/release"
                 }
             ],
             "sessionCookieName": "x3_session",
@@ -54,7 +42,8 @@
                     "url": "/"
                 }
             ],
-            "multiCpuSupport": false
+            "multiCpuSupport": false,
+            "processNum": null
         }
     ],
     "multiProcess": false,
