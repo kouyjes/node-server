@@ -3,15 +3,15 @@
         {
             "serverName": "web app server",
             "debugMode": false,
-            "protocol": "http2",
-            "key": "F:\\source\\node-server\\conf\\private.pem",
-            "cert": "F:\\source\\node-server\\conf\\file.crt",
+            "protocol": "http",
+            "key": null,
+            "cert": null,
             "zipResponse": true,
             "disabledAgentCache": false,
             "docBase": [
                 {
                     "path": "/",
-                    "dir": "e:/opt/deepclue/webapp-taiwan/release"
+                    "dir": "F:\\source\\node-server\\webapps"
                 }
             ],
             "sessionCookieName": "x3_session",
@@ -19,29 +19,11 @@
             "path": null,
             "anonymous": false,
             "port": [
-                8080
+                8888
             ],
             "session": false,
             "attributes": {},
-            "proxy": [
-                {
-                    "pathRule": "^/api",
-                    "server": "172.24.8.100",
-                    "port": 7000,
-                    "protocol": "http",
-                    "headers": {}
-                },
-                {
-                    "pathRule": "^(/targetSearch|/relGraph|/workspaces|/systemManage)",
-                    "server": "",
-                    "port": 8080,
-                    "protocol": "http2",
-                    "key": "F:\\source\\node-server\\conf\\private.pem",
-                    "cert": "F:\\source\\node-server\\conf\\file.crt",
-                    "rejectUnauthorized": false,
-                    "url": "/"
-                }
-            ],
+            "proxy": null,
             "multiCpuSupport": false,
             "processNum": null
         }
