@@ -193,7 +193,7 @@ function wrapperRequestResponse(chain, request, response) {
         };
     }
     response.setHeader('Server', config.serverName);
-    request._url = request.url;
+    request._url = decodeURIComponent(request.url);
     parseUrl(request);
 
     extendRequestResponse(request, response);
