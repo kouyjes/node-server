@@ -1,4 +1,5 @@
 'use strict';
+const domain = require('domain');
 const serverLogger = require('../logger/server-logger'),
     logger = serverLogger.getAppLogger();
 const Request = require('./Request'),
@@ -197,24 +198,28 @@ function requestListener(request, response, config, requestMapping) {
     var userFilterChain = new FilterChain(userFilters,args)
     var dispatchChain = new FilterChain(dispatchers,args);
     const internalFilterChain = new FilterChain(internalFilters, args);
-    internalFilterChain.finishCallback = function () {
-        userFilterChain.next();
-    };
-    userFilterChain.finishCallback = function () {
-        dispatchChain.next();
-    };
-    try{
-        internalFilterChain.next();
-    }catch(e){
+
+
+    var d = domain.create();
+    d.on('error',function (e) {
         if(response.sendError){
-            response.sendError(500, 'server internal error!');
+            response.sendError(500, 'server internal error !' + e);
         }else{
             response.end();
         }
         logger.error(e);
-    }
-
-
+    });
+    d.run(function () {
+        internalFilterChain.finishCallback = function () {
+            userFilterChain.next();
+        };
+        userFilterChain.finishCallback = function () {
+            dispatchChain.next();
+        };
+        internalFilterChain.next();
+    });
 }
 
-
+process.on('uncaughtException', function (err) {
+    logger.error(err);
+});
