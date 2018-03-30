@@ -14,7 +14,7 @@ function appendFileMeta(request,response,absPath){
             if(stats && stats.mtime instanceof Date){
                 flag_304 = lastMtime && lastMtime === stats.mtime.toUTCString();
                 response.setHeader('Last-Modified',stats.mtime.toUTCString());
-                response.setHeader('Cache-Control','max-age=3600');
+                response.setHeader('Cache-Control','public,max-age=3600');
             }
             resolve(flag_304);
         });
@@ -29,6 +29,7 @@ function process_304(chain,request,response){
 
     const config = request.getContextConfig();
     if(config.disabledAgentCache){
+        response.setHeader('Cache-Control','no-cache');
         chain.next();
         return;
     }
