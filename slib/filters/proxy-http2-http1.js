@@ -1,12 +1,6 @@
-var _http2;
-try{
-    _http2 = require('http2');
-}catch(e){
-}
 const http = require('http'),
     https = require('https'),
     fs = require('fs');
-const http2 = _http2;
 const proxyUtil = require('./proxyUtil');
 function proxy(chain,request,response){
 
