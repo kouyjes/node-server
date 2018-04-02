@@ -1,6 +1,6 @@
 {
   "name": "nm-web-server",
-  "version": "1.1.37",
+  "version": "1.1.38",
   "description": "node web server",
   "main": "index.js",
   "scripts": {

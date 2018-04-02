@@ -31,7 +31,7 @@ exports.matchProxy = function (request) {
         proxy.server = proxy.server || '127.0.0.1';
         proxy.port = proxy.port || config.port;
         proxy.headers = proxy.headers || {};
-        proxy.url = proxy.url || reqUrl;
+        proxy.url = encodeURI(proxy.url || reqUrl);
     }
     return proxy;
 };
