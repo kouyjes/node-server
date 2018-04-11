@@ -47,6 +47,7 @@ pathRule:配置代理的代理规则，为一个正则字符串,如：'^/api' <b
 server:配置代理服务器IP <br/>
 port:配置代理服务器端口，默认与请求端口一致 <br/>
 headers:配置发送到代理服务器需要添加的header<br/>
+url:【optional】配置重写url
 
 
 ### 会话配置
@@ -179,52 +180,53 @@ attributes:定义上下文属性，可以通过config对象获取
  
  var filePath = require('../file/file-path');
 config = {
-  debugMode:false,
-  multiProcess:false, //是否对多个contexts启动多进程
-  contexts:[
-    {
-      serverName:'x3 nodejs server', //服务器名称
-      multiCpuSupport:false,//根据CPU数量,启动多个进程,配置为true时，需要配置为redis session
-      zipResponse:true,//对输出进行压缩
-	  protocol:null,//【optional default http】协议定义
-	  sessionCookieName:null,//【optional】
-	  sessionCookiePath:null,//【optional default /】
-	  //protocol:'https', // 【default http】
-      //key:filePath.resolve('conf/private.pem'), //
-      //cert:filePath.resolve('conf/file.crt'), //
-      //disabledAgentCache:true, //禁用客户端缓存
-      docBase:[  //服务器工作目录
-        {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
-		'/workdpace',
-        {dir:'/',path:'/ctx'}
-      ],
-      //optional 不配置session时不会启用session
-      session:{
-          provider:{
-              type:'file',//会话持久化机制
-              dataFile:'/data/log/session.data' //会话文件
-          },
-          /*
-          provider:{
-            type:'redis',
-            host:'127.0.0.1'
-            //port password
-          },
-          */
-          timeout:30,//会话过期时间，单位为分，默认30分钟
-      },
-      path:'/',//上下文路径
-      port:[8080], //服务器监听端口,可配置多个
-      attributes:{anonymous:false}, //配置自定义属性
-	  proxy:{
-		protocol:null,//【optional default http】 协议定义 
-		pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式字符串
-        server:'192.168.1.100', //配置服务端IP
-        port:80, //【optional】配置服务端端口，如不配置则与请求端口一致
-        headers:{} //【optional】配置发送请求时需要添加的header
-	  }
-    }
-  ]
+    debugMode:false,
+    multiProcess:false, //是否对多个contexts启动多进程
+    contexts:[
+        {
+            serverName:'x3 nodejs server', //服务器名称
+            multiCpuSupport:false,//根据CPU数量,启动多个进程,配置为true时，需要配置为redis session
+            zipResponse:true,//对输出进行压缩
+            protocol:null,//【optional default http】协议定义
+            sessionCookieName:null,//【optional】
+            sessionCookiePath:null,//【optional default /】
+            //protocol:'https', // 【default http】
+            //key:filePath.resolve('conf/private.pem'), //
+            //cert:filePath.resolve('conf/file.crt'), //
+            //disabledAgentCache:true, //禁用客户端缓存
+            docBase:[  //服务器工作目录
+                {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}
+                '/workdpace',
+                {dir:'/',path:'/ctx'}
+            ],
+            //optional 不配置session时不会启用session
+            session:{
+                provider:{
+                    type:'file',//会话持久化机制
+                    dataFile:'/data/log/session.data' //会话文件
+                },
+                /*
+                provider:{
+                    type:'redis',
+                    host:'127.0.0.1'
+                    //port password
+                },
+                */
+                timeout:30,//会话过期时间，单位为分，默认30分钟
+            },
+            path:'/',//上下文路径
+            port:[8080], //服务器监听端口,可配置多个
+            attributes:{anonymous:false}, //配置自定义属性
+            proxy:{
+                protocol:null,//【optional default http】 协议定义 
+                pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式字符串
+                server:'192.168.1.100', //配置服务端IP
+                port:80, //【optional】配置服务端端口，如不配置则与请求端口一致
+                headers:{}, //【optional】配置发送请求时需要添加的header
+                url:null //【optional】配置重写url
+            }
+        }
+    ]
 };
 ```
 
