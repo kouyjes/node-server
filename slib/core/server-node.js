@@ -4,13 +4,13 @@ const serverLogger = require('../logger/server-logger'),
     logger = serverLogger.getAppLogger();
 const Request = require('./Request'),
     Response = require('./Response');
-const serverProcess = require('./server-process');
 const util = require('./../util/util');
 const assert = require('assert'), clone = require('clone');
 const cluster = require('cluster');
 const cpuNum = require('os').cpus().length;
 const http = require('http');
 const https = require('https');
+const Runtime = require('../Runtime');
 const http2Getter = function () {
     return require('http2');
 };
@@ -26,7 +26,7 @@ const initFunctions = {
 function extractCommand() {
     const comParams = process.argv.slice(1);
     var paramConfig = {
-        '--config': {value: null, encoding: 'base64'}
+        '--config': {value: null}
     }, config = paramConfig['--config']
     var currentConfig;
     comParams.forEach(function (comParam) {
@@ -37,12 +37,7 @@ function extractCommand() {
         if (!currentConfig) {
             return;
         }
-        if (currentConfig.encoding) {
-            comParam = JSON.parse(new Buffer(comParam, currentConfig.encoding).toString());
-            currentConfig.value = comParam;
-        } else {
-            currentConfig.value = comParam;
-        }
+        currentConfig.value = Runtime.getContext(comParam);
     });
     return config;
 }
@@ -62,11 +57,13 @@ function init(config) {
                 cluster.fork();
             }
             cluster.on('exit', function (oldWorker) {
-                let message = 'worker-' + oldWorker.process.pid + ' died !';
+                var pid = oldWorker.process.pid;
+                let message = 'worker-' + pid + ' died !';
                 logger.error(message);
 
                 let worker = cluster.fork();
-                message = 'worker-' + worker.process.pid + ' started !';
+                pid = worker.process.pid;
+                message = 'worker-' + pid + ' started !';
                 logger.warn(message);
             });
         } else {
@@ -136,7 +133,6 @@ function initHttp2(config){
 }
 if (isMasterProcess) {
     init(extractCommand().value);
-    serverProcess.process();
 } else {
     module.exports = {
         startServer: init

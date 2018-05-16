@@ -1,8 +1,7 @@
-const path = require('path');
 const log4js = require('log4js');
 const Runtime = require('../Runtime');
 const filePath = require('./../../file/file-path');
-const serverConfig = Runtime.getConfig();
+const serverConfig = Runtime.config();
 log4js.loadAppender('file');
 log4js.configure(require(filePath.getLogConfPath()).config, { reloadSecs: 300 });
 const logger = log4js.getLogger('server-sys');

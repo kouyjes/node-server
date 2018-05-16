@@ -1,5 +1,4 @@
 'use strict';
-const fs = require('fs'),path = require('path');
 const filePath = require('../../file/file-path');
 const defaultFileSession = filePath.resolve(filePath.getRuntimePath(),'session.data');
 function ServerContext(context){

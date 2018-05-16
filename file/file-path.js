@@ -16,6 +16,9 @@ exports.getRuntimePath = function () {
 exports.getLogConfPath = function () {
     return resolve('./conf/logger.js');
 };
+exports.getLogPath = function () {
+    return resolve('log');
+};
 exports.getServerConfPath = function () {
     return resolve('./conf/config.js');
 };
@@ -24,4 +27,7 @@ exports.getRuntimeConfPath = function () {
 };
 exports.getInternalLibPath = function () {
     return resolve('slib');
+};
+exports.getSystemDirs = function () {
+    return [this.getRuntimePath(),this.getLogPath()];
 };
