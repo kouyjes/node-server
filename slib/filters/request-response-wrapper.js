@@ -154,7 +154,7 @@ function redirectUrl(url) {
     parseUrl(this);
 }
 function getMime(absPath) {
-    var mime = MIME.lookup(PATH.basename(absPath));
+    var mime = MIME.getType(PATH.basename(absPath));
     if (!mime) {
         mime = 'text/html';
     }
