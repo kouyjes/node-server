@@ -198,10 +198,14 @@ function requestListener(request, response, config, requestMapping) {
 
     var d = domain.create();
     d.on('error',function (e) {
-        if(response.sendError){
-            response.sendError(500, 'server internal error !' + e);
-        }else{
-            response.end();
+        try{
+            if(response.sendError){
+                response.sendError(500, 'server internal error !' + e);
+            }else{
+                response.end();
+            }
+        }catch (e){
+            logger.error(e);
         }
         logger.error(e);
     });

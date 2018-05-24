@@ -148,6 +148,22 @@ exports.config = {
 };
 ```
 
+#### combo属性，当combo为true时允许请求多个静态资源
+```javascript
+exports.config = {
+    contexts:[
+        {
+            ...
+            combo:true
+        }
+    ]
+};
+//请求url格式 http://localhost??app/test.js,js/common.js
+//注意多个?(＞＝2)为识别符 如：http://localhost????app/test.js,js/common.js
+// http://localhost/app/comp??a.js,b.js,c.js
+```
+
+
 ### 配置上下文属性
 ```javascript
 exports.config = {
@@ -217,6 +233,7 @@ config = {
             path:'/',//上下文路径
             port:[8080], //服务器监听端口,可配置多个
             attributes:{anonymous:false}, //配置自定义属性
+            combo:true, //合并请求资源
             proxy:{
                 protocol:null,//【optional default http】 协议定义 
                 pathRule:null,//【required】配置需要代理url的匹配规则，为正则表达式字符串

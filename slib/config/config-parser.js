@@ -20,11 +20,12 @@ function ServerContext(context){
         {name:'attributes',value:{}},
         {name:'proxy',value:null},
         {name:'multiCpuSupport',value:false},
-        {name:'processNum',value:null}
+        {name:'processNum',value:null},
+        {name:'combo',value:true}
     ];
-    properties.forEach(function (property) {
+    properties.forEach((property) => {
         var setInvoke = this['set' + property.name.substring(0,1).toUpperCase() + property.name.substring(1)];
-        if(context && context[property.name]){
+        if(context && context[property.name] !== undefined){
             if(typeof setInvoke === 'function'){
                 setInvoke.call(this,context[property.name]);
             }else{
@@ -33,7 +34,7 @@ function ServerContext(context){
         }else{
             this[property.name] = property.value;
         }
-    }.bind(this));
+    });
 
 }
 class CustomError extends TypeError{

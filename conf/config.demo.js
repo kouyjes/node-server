@@ -48,6 +48,7 @@ const config = {
             },
             path:'/',//上下文路径
             port:[8080], //服务器监听端口,可配置多个
+            combo:true,//启用资源合并优化
             attributes:{anonymous:false}, //配置自定义属性
             proxy:{
                 pathRule:'^/api',

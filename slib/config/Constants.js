@@ -13,7 +13,7 @@ function define(name, value) {
     constant[name] = value;
     return define;
 }
-define('config.context.controllerDirName', 'controllers')
+define('config.http.message.404','404 error not found resource ! ')('config.context.controllerDirName', 'controllers')
 ('config.context.filterDirName', 'filters')
 ('config.context.controller.mapping', '$mappingUrl')
 ('config.context.filter.path', '$contextPath')

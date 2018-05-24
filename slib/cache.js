@@ -16,7 +16,7 @@ class XCache {
         var _ = this;
         var promise = new Promise(function (resolve, reject) {
             _.cacheProvider.get(key, function (err, value) {
-                if (!err && value) {
+                if (!err) {
                     resolve(value);
                 } else {
                     logger.error(err);

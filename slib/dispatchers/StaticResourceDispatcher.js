@@ -8,5 +8,5 @@ function execute(chain,request,response){
     response.outputFile(request.pathname,acceptEncoding);
     chain.next();
 }
-execute.priority = -1;
+execute.priority = -999;
 module.exports.execute = execute;
