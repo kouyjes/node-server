@@ -1,16 +1,5 @@
 const FS = require('fs'), PATH = require('path'), MIME = require('mime'), URL = require('url');
 const zlib = require('zlib');
-const XCache = require('../cache');
-const filePathCache = new XCache();
-const Constants = require('../config/Constants');
-function checkContextPath(pathname, contextPath) {
-    if (!pathname.startsWith(contextPath)) {
-        return false;
-    }
-    pathname = pathname.substring(contextPath.length);
-    pathname = pathname.replace(/^\/+/, '');
-    return pathname;
-}
 function sendError(errorCode, message) {
     if (!errorCode) {
         errorCode = 404;
@@ -71,56 +60,17 @@ function outputContent(mime, content) {
     this.writeHead(200, {'Content-Type': mime});
     this.end(content);
 }
-function appendDirIndexFile(absPath) {
-    if(!absPath.endsWith('/')){
-        absPath += '/';
-    }
-    absPath = absPath + 'index.html';
-    return absPath;
-}
-function outputFile(pathname, acceptEncoding) {
-    const _ = this,
-        config = _.getContextConfig();
-    var result = config.docBase.some(function (doc) {
-        const contextPath = (doc.path || config.path || '/');
-        var currentPathname = checkContextPath(pathname, contextPath);
-        if(currentPathname === false){
-            return;
-        }
-        if (currentPathname.startsWith(doc.filters || Constants.get('config.context.filterDirName'))
-            || currentPathname.startsWith(doc.controllers || Constants.get('config.context.controllerDirName'))) {
-            return;
-        }
-
-        var absPath = PATH.resolve(doc.dir, currentPathname);
-        var cacheFileMime = filePathCache.syncGet(absPath);
-        if (cacheFileMime || (FS.existsSync(absPath))) {
-
-            let pathStat = FS.statSync(absPath);
-            if(!cacheFileMime && pathStat.isDirectory()){
-                absPath = appendDirIndexFile(absPath);
-                cacheFileMime = filePathCache.syncGet(absPath);
-                if(cacheFileMime || (FS.existsSync(absPath) && (pathStat = FS.statSync(absPath)).isFile())){
-                }else{
-                    return;
-                }
-            }
-            if(!cacheFileMime){
-                if(!pathStat.isFile()){
-                    return;
-                }
-                filePathCache.set(absPath, getMime(absPath), 3000);
-            }
-            if (acceptEncoding) {
-                _.zipOutputStaticResource(absPath, acceptEncoding);
-            } else {
-                _.outputStaticResource(absPath);
-            }
-            return true;
-        }
-    });
-    if (!result) {
+async function outputFile(pathname, acceptEncoding) {
+    const _ = this;
+    var absPath = await _.findResourceByPathname(pathname);
+    if (!absPath) {
         _.sendError(404, '404 error not found resource ');
+        return;
+    }
+    if (acceptEncoding) {
+        _.zipOutputStaticResource(absPath, acceptEncoding);
+    } else {
+        _.outputStaticResource(absPath);
     }
 }
 function getAttribute(requestCache) {
