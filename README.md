@@ -104,7 +104,7 @@ password:配置redis连接密码<br/>
 
 
 ### server的协议支持
-node-server协议类型支持http|h2|https
+node-server协议类型支持http|http2|https
 
 #### http
 ```javascript
@@ -140,7 +140,7 @@ exports.config = {
     contexts:[
         {
             ...
-            protocol:'h2',
+            protocol:'http2',
             key:filePath.resolve('conf/private.pem'),
             cert:filePath.resolve('conf/file.crt')
         }
