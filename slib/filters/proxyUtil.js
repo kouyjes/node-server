@@ -46,7 +46,7 @@ exports.matchProxy = function (request) {
             remoteAddress = remoteAddress.replace(/^::f{4}:/,'')
         }
         if(remoteAddress){
-            proxy['X-Forward-For'] = remoteAddress;
+            proxy.headers['X-Forward-For'] = remoteAddress;
         }
         proxy.url = encodeURI(proxy.url || reqUrl);
         if(typeof proxy.scriptFn === 'function'){
