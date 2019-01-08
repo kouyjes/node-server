@@ -55,7 +55,7 @@ function proxy(chain,request,response){
         if(response.finished){
            return;
         }
-        response.sendError(500,'proxy request error !' + JSON.stringify(e));
+        response.sendError(500,JSON.stringify(e));
     });
     if(typeof proxy.timeout === 'number'){
         proxyRequest.setTimeout(proxy.timeout, function () {
