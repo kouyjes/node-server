@@ -49,6 +49,7 @@ function proxy(chain,request,response){
         });
         options.headers = headers;
     }
+
     var proxyRequest = proxyClient.request(options, function (res) {
         if(response.finished){
             return;
@@ -64,14 +65,13 @@ function proxy(chain,request,response){
             }
             response.write(data);
         }).on('end', function () {
-            if(response.finished){
-                return;
+            if(!response.finished){
+                response.end();
             }
-            response.end();
         });
     }).on('error', function (e) {
         if(response.finished){
-           return;
+            return;
         }
         response.sendError(500,JSON.stringify(e));
     });
@@ -89,6 +89,13 @@ function proxy(chain,request,response){
     });
     request.on('end', function () {
         proxyRequest.end();
+    });
+    request.on('abort',function(){
+        proxyRequest.abort();
+    }).on('timeout',function(){
+        proxyRequest.abort();
+    }).on('close',function(){
+        proxyRequest.abort();
     });
 }
 proxy.priority = 99;

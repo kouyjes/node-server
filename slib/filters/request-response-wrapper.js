@@ -1,15 +1,5 @@
 const FS = require('fs'), PATH = require('path'), MIME = require('mime'), URL = require('url');
 const zlib = require('zlib');
-function sendError(errorCode, message) {
-    if (!errorCode) {
-        errorCode = 404;
-    }
-    if (!message) {
-        message = '';
-    }
-    this.writeHead(errorCode, {'Content-Type': 'text/html'});
-    this.end(message);
-}
 function outputStaticResource(absPath) {
     const _ = this;
     var mime = getMime(absPath);
@@ -85,8 +75,7 @@ function setAttribute(requestCache) {
     }
 }
 function extendRequestResponse(request, response) {
-
-    response.sendError = sendError;
+    
     response.outputStaticResource = outputStaticResource;
     response.zipOutputStaticResource = zipOutputStaticResource;
     response.zipOutputContent = zipOutputContent;

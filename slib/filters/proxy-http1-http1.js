@@ -43,16 +43,19 @@ function proxy(chain,request,response){
         }
         proxyClient = https;
     }
+
     var proxyRequest = proxyClient.request(options, function (res) {
         var headers = res.headers || {};
         response.writeHead(res.statusCode,headers);
         res.on('data', function (data) {
             response.write(data);
         }).on('end', function () {
-            response.end();
+            if(!response.finished){
+                response.end();
+            }
         });
     }).on('error', function (e) {
-        if(response.finished){
+        if(response.finished || request.aborted){
            return;
         }
         response.sendError(500,JSON.stringify(e));
@@ -68,6 +71,13 @@ function proxy(chain,request,response){
     });
     request.on('end', function () {
         proxyRequest.end();
+    });
+    request.on('abort',function(){
+        proxyRequest.abort();
+    }).on('timeout',function(){
+        proxyRequest.abort();
+    }).on('close',function(){
+        proxyRequest.abort();
     });
 }
 proxy.priority = 99;

@@ -26,6 +26,13 @@ function appendDirIndexFile(absPath) {
     return absPath;
 }
 function sendError(errorCode, message) {
+    if(this.finished){
+        return;
+    }
+    if(this.headersSent){
+        this.end();
+        return;
+    }
     if (!errorCode) {
         errorCode = 404;
     }
