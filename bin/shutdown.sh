@@ -2,7 +2,6 @@
 currentPath=`pwd`
 serverPath=$(dirname "$0")
 cd $serverPath
-./mkdirs.sh
 pidPath=../runtime/server.pid
 IFS_OLD=$IFS
 IFS=" "
