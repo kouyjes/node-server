@@ -4,7 +4,6 @@ then
   currentPath=`pwd`
   serverPath=$(dirname "$0")
   cd "$serverPath"
-  ./mkdirs.sh
   ./shutdown.sh
   sleep 1s
   node ../slib/main.js &
