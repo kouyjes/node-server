@@ -32,7 +32,11 @@ exports.matchProxy = function (request) {
         }
         if(typeof p.matchScriptFn === 'function'){
             try{
-                return p.matchScriptFn.call(null,request);
+                let match = p.matchScriptFn.call(null,request);
+                if(match){
+                    proxy = p;
+                }
+                return match;
             }catch(e){
                 logger.error(e);
             }
