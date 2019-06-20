@@ -1,5 +1,5 @@
 const clone = require('clone');
-const logger = require('../logger/server-logger').getAppLogger();
+const logger = require('../../logger/server-logger').getAppLogger();
 function parseScript(scripts){
     let fn = null;
     if(typeof scripts === 'string'){
