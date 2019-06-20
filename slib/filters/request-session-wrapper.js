@@ -9,10 +9,10 @@ function sessionWrapper(chain, request, response) {
         return;
     }
     const sessionKey = config['sessionCookieName'] || SESSION_PREFIX + Number(config.port).toString(16);
-    var sessionCookie = request.getCookie(sessionKey);
-    var sessionProvider = SessionProvider.getProvider(config);
+    let sessionCookie = request.getCookie(sessionKey);
+    const sessionProvider = SessionProvider.getProvider(config);
 
-    var session;
+    let session;
 
     function createNewSession(sessionId) {
         sessionCookie = request.createCookie(sessionKey, sessionId || uuid_v4());

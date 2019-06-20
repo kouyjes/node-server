@@ -1,5 +1,6 @@
 const proxy = require('./proxy').proxy;
-var creating = false;
+let creating = false;
+
 function Request(){
     if(!creating){
         throw new Error('constructor is disabled !');
@@ -7,7 +8,7 @@ function Request(){
 }
 Request.create = function (request) {
     creating = true;
-    var _request = new Request();
+    const _request = new Request();
     creating = false;
     return proxy(_request,request);
 }

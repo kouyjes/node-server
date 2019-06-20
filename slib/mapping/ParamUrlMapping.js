@@ -41,14 +41,14 @@ class ParamUrlMapping{
                     return;
                 }
                 if(pathCheckParamReg.test(path)){
-                    var paramNames = [];
+                    const paramNames = [];
                     let regPath = mapPath.replace(pathParamReg, function (match,paramName) {
                         paramNames.push(paramName);
                         return '([^/\\{}]+)';
                     });
                     regPath = '^' + regPath + '$';
                     method.pathVariables = paramNames;
-                    var urlRegExp = method[METHOD_REG];
+                    let urlRegExp = method[METHOD_REG];
                     if(!Array.isArray(urlRegExp)){
                         urlRegExp = method[METHOD_REG] = [];
                     }
@@ -78,14 +78,14 @@ class ParamUrlMapping{
         if(!ctrlMethod){
             return false;
         }
-        var allowMethods = ctrlMethod[METHOD] || [];
+        let allowMethods = ctrlMethod[METHOD] || [];
         if(!Array.isArray(allowMethods)){
             allowMethods = [].concat(allowMethods);
         }
         if(allowMethods.length === 0){
             return true;
         }
-        var _METHOD = request.method.toUpperCase();
+        const _METHOD = request.method.toUpperCase();
         return allowMethods.some(function (m) {
             if(typeof m !== 'string'){
                 return;
@@ -95,11 +95,12 @@ class ParamUrlMapping{
     }
     matchMethod(request){
 
-        var _this = this;
-        var mapPath = request.pathname;
-        var pathRoute = this.pathRoute;
-        var paths = mapPath.split(/\//);
-        var method = this.pathMapping[mapPath],pathParams = {};
+        const _this = this;
+        const mapPath = request.pathname;
+        let pathRoute = this.pathRoute;
+        const paths = mapPath.split(/\//);
+        let method = this.pathMapping[mapPath];
+        const pathParams = {};
 
         if(this.isHttpMethodMatch(request,method)){
             Object.freeze(pathParams);
@@ -114,8 +115,8 @@ class ParamUrlMapping{
                 return;
             }
             pathRoute.methods.some(function (m) {
-                var urlRegExp = m[METHOD_REG] || [];
-                var match = null;
+                const urlRegExp = m[METHOD_REG] || [];
+                let match = null;
                 urlRegExp.some(function (regExp) {
                     match = mapPath.match(regExp);
                     return !!match;

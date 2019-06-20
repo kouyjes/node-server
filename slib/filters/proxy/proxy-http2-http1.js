@@ -10,20 +10,21 @@ function proxy(chain,request,response){
         chain.next();
         return;
     }
-    var proxy = proxyUtil.matchProxy(request);
+    const proxy = proxyUtil.matchProxy(request);
     if(!proxy || ['http','https'].indexOf(proxy.protocol) === -1){
         chain.next();
         return;
     }
 
-    var options = {
+    const options = {
         hostname: proxy.server,
         port: proxy.port,
         path: proxy.url,
         method: request.method,
-        headers: Object.assign(request.headers,proxy.headers)
+        headers: Object.assign(request.headers, proxy.headers)
     };
-    var proxyClient = http;
+    let proxyClient = http;
+
     function configKeyCert(){
         if(proxy.key && fs.existsSync(proxy.key)){
             options.key = fs.readFileSync(proxy.key);
@@ -42,38 +43,38 @@ function proxy(chain,request,response){
         proxyClient = https;
     }
     if(config.protocol === 'http2'){
-        var headers = {};
+        const headers = {};
         Object.keys(options.headers).map(function (headerName) {
-            var _headerName = headerName.replace(/^:/,'');
+            const _headerName = headerName.replace(/^:/, '');
             headers[_headerName] = options.headers[headerName];
         });
         options.headers = headers;
     }
 
-    var proxyRequest = proxyClient.request(options, function (res) {
-        if(response.finished){
+    const proxyRequest = proxyClient.request(options, function (res) {
+        if (response.finished) {
             return;
         }
-        var headers = Object.assign({},res.headers);
-        ['connection','method','path','transfer-encoding'].forEach(function (key) {
+        const headers = Object.assign({}, res.headers);
+        ['connection', 'method', 'path', 'transfer-encoding'].forEach(function (key) {
             delete headers[key];
         });
-        response.writeHead(res.statusCode,headers);
+        response.writeHead(res.statusCode, headers);
         res.on('data', function (data) {
-            if(response.finished){
-               return;
+            if (response.finished) {
+                return;
             }
             response.write(data);
         }).on('end', function () {
-            if(!response.finished){
+            if (!response.finished) {
                 response.end();
             }
         });
     }).on('error', function (e) {
-        if(response.finished){
+        if (response.finished) {
             return;
         }
-        response.sendError(500,JSON.stringify(e));
+        response.sendError(500, JSON.stringify(e));
     });
     if(typeof proxy.timeout === 'number'){
         proxyRequest.setTimeout(proxy.timeout, function () {

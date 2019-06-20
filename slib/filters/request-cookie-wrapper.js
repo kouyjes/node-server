@@ -1,11 +1,11 @@
 const Cookie = require('../cookie/Cookie');
 const assert = require('assert');
 function requestCookieWrapper(chain,request,response){
-    var cookieString = request.headers.cookie;
+    let cookieString = request.headers.cookie;
     if(!cookieString){
         cookieString = '';
     }
-    var cookieStrings = cookieString.split(';');
+    const cookieStrings = cookieString.split(';');
     const requestCookies = {};
     cookieStrings.forEach(function (cookieStr) {
         const cookie = Cookie.parse(cookieStr);
@@ -18,7 +18,7 @@ function requestCookieWrapper(chain,request,response){
     const responseCookies = {};
     function flushResponseCookie(response){
         const cookies = [];
-        for(var attr in responseCookies){
+        for(let attr in responseCookies){
             if(responseCookies.hasOwnProperty(attr)){
                 cookies.push(responseCookies[attr].toString());
             }

@@ -19,7 +19,7 @@ function startServer(config) {
 
     const serverContexts = serverConfig.getContexts();
 
-    var contexts = [];
+    const contexts = [];
     serverContexts.forEach(function (ctx) {
         const ports = ctx.port;
         ports.forEach(function (port) {

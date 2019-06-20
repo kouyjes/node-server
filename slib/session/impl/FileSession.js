@@ -14,7 +14,7 @@ class FileSession extends Session{
     }
     setAttribute(name,value){
         this.attributes[name] = value;
-        var property = {};
+        const property = {};
         property[name] = value;
         return this.provider.syncSession(this,property);
     }
@@ -25,7 +25,7 @@ class FileSession extends Session{
         return this.provider.syncSession(this,property);
     }
     _getSyncAttribute(name){
-        var promise = new Promise(function (resolve,reject) {
+        const promise = new Promise(function (resolve, reject) {
             resolve(this.getAttribute(name));
         }.bind(this));
         return promise;
@@ -37,8 +37,8 @@ class FileSession extends Session{
         return this.attributes[name];
     }
     invalid(){
-        var attributes = this.attributes;
-        var keys = Object.keys(attributes);
+        const attributes = this.attributes;
+        const keys = Object.keys(attributes);
         keys.forEach(function (key) {
             delete attributes[key];
         });

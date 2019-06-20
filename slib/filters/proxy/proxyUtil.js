@@ -1,20 +1,43 @@
 const clone = require('clone');
 const logger = require('../logger/server-logger').getAppLogger();
+function parseScript(scripts){
+    let fn = null;
+    if(typeof scripts === 'string'){
+        try{
+            fn = new Function('request',scripts);
+        }catch(e){
+            logger.error(e);
+        }
+    }
+    return fn;
+}
 exports.matchProxy = function (request) {
 
     const config = request.getContextConfig();
-    var _proxy = config.proxy;
-    var reqUrl = request._url;
-    var proxies = [];
+    const _proxy = config.proxy;
+    const reqUrl = request._url;
+    let proxies = [];
 
     if(_proxy instanceof Array){
         proxies = _proxy;
     }else if(_proxy){
         proxies.push(_proxy);
     }
-    var proxy = null;
+    let proxy = null;
     proxies.some(function (p) {
-        var pathRule = p.pathRule;
+        let matchScript = p.matchScript;
+        if(typeof matchScript === 'string'){
+            p.matchScriptFn = parseScript(matchScript);
+            delete p.matchScript;
+        }
+        if(typeof p.matchScriptFn === 'function'){
+            try{
+                return p.matchScriptFn.call(null,request);
+            }catch(e){
+                logger.error(e);
+            }
+        }
+        let pathRule = p.pathRule;
         if(typeof pathRule === 'string'){
             pathRule = new RegExp(pathRule);
         }
@@ -29,12 +52,8 @@ exports.matchProxy = function (request) {
     if(proxy){
         let scripts = proxy.scripts;
         if(typeof scripts === 'string'){
-            try{
-                proxy.scriptFn = new Function('request',scripts);
-                delete proxy.scripts;
-            }catch(e){
-                logger.error(e);
-            }
+            proxy.scriptFn = parseScript(scripts);
+            delete proxy.scripts;
         }
         proxy = clone(proxy);
         proxy.protocol = proxy.protocol || config.protocol || 'http';
@@ -51,7 +70,7 @@ exports.matchProxy = function (request) {
         proxy.url = encodeURI(proxy.url || reqUrl);
         if(typeof proxy.scriptFn === 'function'){
             try{
-                proxy.scriptFn.call(proxy,request);
+                proxy.scriptFn.call(null,request);
             }catch(e){
                 logger.error(e);
             }

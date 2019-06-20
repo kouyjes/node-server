@@ -1,6 +1,6 @@
 'use strict';
 const logger = require('./logger/server-logger').getAppLogger();
-var NodeCache = require("node-cache");
+const NodeCache = require("node-cache");
 
 const Promise = require('promise');
 class XCache {
@@ -13,8 +13,8 @@ class XCache {
     }
 
     get(key) {
-        var _ = this;
-        var promise = new Promise(function (resolve, reject) {
+        const _ = this;
+        const promise = new Promise(function (resolve, reject) {
             _.cacheProvider.get(key, function (err, value) {
                 if (!err) {
                     resolve(value);

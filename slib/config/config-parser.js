@@ -2,29 +2,29 @@
 const filePath = require('../../file/file-path');
 const defaultFileSession = filePath.resolve(filePath.getRuntimePath(),'session.data');
 function ServerContext(context){
-    var properties = [
-        {name:'serverName',value:'x3 server'},
-        {name:'debugMode',value:false},
-        {name:'protocol',value:'http'},
-        {name:'key',value:null},
-        {name:'cert',value:null},
-        {name:'zipResponse',value:false},
-        {name:'disabledAgentCache',value:false},
-        {name:'docBase',value:[]},
-        {name:'sessionCookieName',value:null},
-        {name:'sessionCookiePath',value:'/'},
-        {name:'path',value:null},
-        {name:'anonymous',value:false },
-        {name:'port',value:[7771]},
-        {name:'session',value:false},
-        {name:'attributes',value:{}},
-        {name:'proxy',value:null},
-        {name:'multiCpuSupport',value:false},
-        {name:'processNum',value:null},
-        {name:'combo',value:true}
+    const properties = [
+        {name: 'serverName', value: 'x3 server'},
+        {name: 'debugMode', value: false},
+        {name: 'protocol', value: 'http'},
+        {name: 'key', value: null},
+        {name: 'cert', value: null},
+        {name: 'zipResponse', value: false},
+        {name: 'disabledAgentCache', value: false},
+        {name: 'docBase', value: []},
+        {name: 'sessionCookieName', value: null},
+        {name: 'sessionCookiePath', value: '/'},
+        {name: 'path', value: null},
+        {name: 'anonymous', value: false},
+        {name: 'port', value: [7771]},
+        {name: 'session', value: false},
+        {name: 'attributes', value: {}},
+        {name: 'proxy', value: null},
+        {name: 'multiCpuSupport', value: false},
+        {name: 'processNum', value: null},
+        {name: 'combo', value: true}
     ];
     properties.forEach((property) => {
-        var setInvoke = this['set' + property.name.substring(0,1).toUpperCase() + property.name.substring(1)];
+        const setInvoke = this['set' + property.name.substring(0, 1).toUpperCase() + property.name.substring(1)];
         if(context && context[property.name] !== undefined){
             if(typeof setInvoke === 'function'){
                 setInvoke.call(this,context[property.name]);
@@ -64,7 +64,7 @@ ServerContext.prototype.setDocBase = function (docBase) {
     if(!docBase){
         return;
     }
-    var errorInfo;
+    let errorInfo;
     if(typeof docBase === 'string'){
         docBase = [{dir:docBase}];
     }else if(docBase.dir){
@@ -94,7 +94,7 @@ ServerContext.prototype.setPort = function (port) {
     if(!port){
         return;
     }
-    var errorInfo;
+    let errorInfo;
     if(typeof port === 'number'){
         port = [port];
     }

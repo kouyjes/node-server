@@ -22,7 +22,7 @@ exports.config = function (key,config) {
     if(arguments.length === 0){
         return config;
     }
-    var configObj = {};
+    let configObj = {};
     if(arguments.length === 1){
         if(typeof key === 'object'){
             configObj = key;
@@ -38,8 +38,8 @@ exports.config = function (key,config) {
     fs.writeFileSync(runtimeConfFile,JSON.stringify(config,null,4));
 };
 exports.getContext = function (contextKey) {
-    var contexts = this.config('contexts') || [];
-    var context = null;
+    const contexts = this.config('contexts') || [];
+    let context = null;
     contexts.some(function (ctx) {
         if(ctx.port == contextKey){
             context = ctx;
@@ -54,7 +54,7 @@ function pids(pidList) {
         fs.writeFileSync(pidPath, pidList.join(' '));
         return;
     }
-    var pidContent = '';
+    let pidContent = '';
     if (fs.existsSync(pidPath)) {
         pidContent = new Buffer(fs.readFileSync(pidPath)).toString('utf-8');
     }
@@ -62,7 +62,7 @@ function pids(pidList) {
 }
 function _process(pid) {
     var pid = pid || process.pid;
-    var _pids = pids();
+    const _pids = pids();
     if(_pids.indexOf(pid) === -1){
         _pids.push(pid);
     }
@@ -74,8 +74,8 @@ function startProcess(pid) {
     _process(pid);
 }
 exports.removeProcess = function (pid) {
-    var _pids = pids();
-    var index = _pids.indexOf(pid);
+    const _pids = pids();
+    const index = _pids.indexOf(pid);
     if(index >= 0){
         _pids.splice(index,1);
     }

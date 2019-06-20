@@ -1,7 +1,7 @@
 function proxy(source,targetObject){
     return new Proxy(source,{
         get: function (target,key) {
-            var value = Reflect.get(target, key, target);
+            let value = Reflect.get(target, key, target);
             if(value !== void 0){
                 return value;
             }
@@ -12,7 +12,7 @@ function proxy(source,targetObject){
             return value;
         },
         set: function (target,key,value) {
-            var _v =  Reflect.get(targetObject, key, targetObject);
+            const _v = Reflect.get(targetObject, key, targetObject);
             if(_v !== void 0){
                 Reflect.set(targetObject,key,value, targetObject);
             }else{

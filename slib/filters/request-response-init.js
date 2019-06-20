@@ -4,7 +4,7 @@ const filePathCache = new XCache();
 const Constants = require('../config/Constants');
 const Promise = require('promise');
 function getMime(absPath) {
-    var mime = MIME.getType(PATH.basename(absPath));
+    let mime = MIME.getType(PATH.basename(absPath));
     if (!mime) {
         mime = 'text/html';
     }
@@ -43,7 +43,7 @@ function sendError(errorCode, message) {
     this.end(message);
 }
 function sendError404(errorInfo) {
-    var message = Constants.get('config.http.message.404');
+    let message = Constants.get('config.http.message.404');
     if(errorInfo){
         message = message + errorInfo;
     }
@@ -75,10 +75,10 @@ function stat(absPath) {
 async function findResourceByPathname(_pathname) {
     const _ = this,
         config = _.getContextConfig();
-    var resources = [];
-    var isArray = _pathname instanceof Array;
-    var pathnameArray = isArray ? _pathname : [_pathname];
-    var index = 0;
+    const resources = [];
+    const isArray = _pathname instanceof Array;
+    const pathnameArray = isArray ? _pathname : [_pathname];
+    let index = 0;
     for(let pathname of pathnameArray){
         for(let doc of config.docBase){
             const contextPath = (doc.path || config.path || '/');
@@ -137,7 +137,7 @@ function extend(request,response) {
     response.sendError404 = sendError404;
     response.getMime = getMime;
 
-    var requestCache = {};
+    const requestCache = {};
     request.getAttribute = getAttribute(requestCache);
     request.setAttribute = setAttribute(requestCache);
 }

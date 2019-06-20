@@ -33,7 +33,7 @@ class RequestMapping {
     }
 
     getMatchedRequestHandler(request) {
-        var methodInfo = this.mapping.paramUrlMapping.matchMethod(request);
+        const methodInfo = this.mapping.paramUrlMapping.matchMethod(request);
         return methodInfo;
     }
 
@@ -51,7 +51,7 @@ class RequestMapping {
     _initUserFilters(config) {
         this._initFilters(config.docBase, this.mapping.userFilters, false);
         this.mapping.userFilters.forEach(function (filter) {
-            var key = Constants.get('config.context.filter.path');
+            const key = Constants.get('config.context.filter.path');
             if(!filter[key]){
                 filter[key] = config.path || '/';
             }
@@ -60,12 +60,12 @@ class RequestMapping {
 
     _initFilters(dirs, filters, isInternal) {
         dirs.forEach(function (d) {
-            var directory = path.resolve(d.dir, d.filters || Constants.get('config.context.filterDirName'));
+            const directory = path.resolve(d.dir, d.filters || Constants.get('config.context.filterDirName'));
             if (!fs.existsSync(directory)) {
                 return;
             }
             function extractDirectory(dir) {
-                var files = fs.readdirSync(dir);
+                const files = fs.readdirSync(dir);
                 files.forEach(function (file) {
                     const absPath = path.resolve(dir, file);
                     if (fs.statSync(absPath).isDirectory()) {
@@ -98,7 +98,7 @@ class RequestMapping {
 
     _sortFilters(filters) {
         filters.sort(function (f1, f2) {
-            var v1 = f1.priority ? f1.priority : 0, v2 = f2.priority ? f2.priority : 0;
+            const v1 = f1.priority ? f1.priority : 0, v2 = f2.priority ? f2.priority : 0;
             if (v1 > v2) {
                 return -1;
             } else if (v1 < v2) {
@@ -110,15 +110,15 @@ class RequestMapping {
 
     _initDocs(config) {
         const docs = config.docBase;
-        var _ = this;
+        const _ = this;
         docs.forEach(function (d) {
             const contextPath = d.path || config.path || '/';
-            var directory = path.resolve(d.dir, d['controllers'] || Constants.get('config.context.controllerDirName'));
+            const directory = path.resolve(d.dir, d['controllers'] || Constants.get('config.context.controllerDirName'));
             if (!fs.existsSync(directory)) {
                 return;
             }
             function extractDirectory(dir) {
-                var files = fs.readdirSync(dir);
+                const files = fs.readdirSync(dir);
                 files.forEach(function (file) {
                     const absPath = path.resolve(dir, file);
                     if (fs.statSync(absPath).isDirectory()) {
@@ -140,12 +140,12 @@ class RequestMapping {
     }
 
     initController(contextPath, ctrlPath, ctrl) {
-        var _ = this;
+        const _ = this;
         Object.keys(ctrl).forEach(function (k) {
             if (!ctrl.hasOwnProperty(k) || typeof ctrl[k] !== 'function') {
                 return;
             }
-            var mapPath = ctrl[k][Constants.get('config.context.controller.mapping')];
+            let mapPath = ctrl[k][Constants.get('config.context.controller.mapping')];
             if (!mapPath) {
                 mapPath = ctrlPath + '/' + k;
                 mapPath = contextPath + '/' + mapPath;
@@ -167,8 +167,8 @@ class RequestMapping {
     getMatchedUserFilters(url){
         url = url || '';
         return this.mapping.userFilters.filter(function (filter) {
-            var key = Constants.get('config.context.filter.path');
-            var filterContextPath = filter[key];
+            const key = Constants.get('config.context.filter.path');
+            const filterContextPath = filter[key];
             if(!filterContextPath){
                 return false;
             }

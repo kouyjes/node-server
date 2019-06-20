@@ -25,10 +25,10 @@ const initFunctions = {
 };
 function extractCommand() {
     const comParams = process.argv.slice(1);
-    var paramConfig = {
+    const paramConfig = {
         '--config': {value: null}
-    }, config = paramConfig['--config']
-    var currentConfig;
+    }, config = paramConfig['--config'];
+    let currentConfig;
     comParams.forEach(function (comParam) {
         if (paramConfig[comParam]) {
             currentConfig = paramConfig[comParam];
@@ -50,14 +50,14 @@ function init(config) {
     }
 
     const protocol = config.protocol;
-    var processNum = config['processNum'] || cpuNum;
+    const processNum = config['processNum'] || cpuNum;
     if (isMasterProcess && config.multiCpuSupport) {
         if (cluster.isMaster) {
             for (let i = 0; i < processNum; i++) {
                 cluster.fork();
             }
             cluster.on('exit', function (oldWorker) {
-                var pid = oldWorker.process.pid;
+                let pid = oldWorker.process.pid;
                 let message = 'worker-' + pid + ' died !';
                 logger.error(message);
 
@@ -124,7 +124,7 @@ function initHttp2(config){
         cert: fs.readFileSync(config.cert),
         allowHTTP1:true
     };
-    var http2 = http2Getter();
+    const http2 = http2Getter();
     const server = http2['createSecureServer'](option, function (req, resp) {
         let params = [req, resp, config, requestMapping];
         requestListener.apply(this, params);
@@ -147,7 +147,7 @@ class FilterChain {
     }
 
     next() {
-        var params = Array.prototype.slice.call(arguments);
+        const params = Array.prototype.slice.call(arguments);
         if(params.length > 0){
             params.forEach((param) => {
                 if(param instanceof Request){
@@ -164,8 +164,8 @@ class FilterChain {
             }
             return;
         }
-        var filter = this.filters[this.index.count++];
-        var args = this.filterArgs;
+        const filter = this.filters[this.index.count++];
+        const args = this.filterArgs;
 
         filter.apply(null, [this].concat(args));
     }
@@ -186,17 +186,17 @@ function requestListener(request, response, config, requestMapping) {
 
 
     //execute filters interrupt if return false
-    var internalFilters = requestMapping.getInternalFilters();
-    var userFilters = requestMapping.getMatchedUserFilters(request.url);
-    var dispatchers = requestMapping.getInternalDispatchers();
-    var args = [request, response];
+    const internalFilters = requestMapping.getInternalFilters();
+    const userFilters = requestMapping.getMatchedUserFilters(request.url);
+    const dispatchers = requestMapping.getInternalDispatchers();
+    const args = [request, response];
 
-    var userFilterChain = new FilterChain(userFilters,args)
-    var dispatchChain = new FilterChain(dispatchers,args);
+    const userFilterChain = new FilterChain(userFilters, args);
+    const dispatchChain = new FilterChain(dispatchers, args);
     const internalFilterChain = new FilterChain(internalFilters, args);
 
 
-    var d = domain.create();
+    const d = domain.create();
     d.on('error',function (e) {
         try{
             if(response.sendError){

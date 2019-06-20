@@ -12,10 +12,11 @@ Cookie.parse = function (cookieText) {
     if(typeof cookieText !== 'string') {
         throw new TypeError('invalid parameter !' + cookieText);
     }
-    var seps = cookieText.split(';');
-    var name,value,properties = {};
+    const seps = cookieText.split(';');
+    let name, value;
+    const properties = {};
     seps.forEach(function (sep) {
-        var pair = sep.split('=');
+        const pair = sep.split('=');
         switch (pair[0].toLowerCase().trim()){
             case 'path':
                 properties['path'] = pair[1]?pair[1].trim():'';
@@ -34,7 +35,7 @@ Cookie.parse = function (cookieText) {
                 value = pair[1]?pair[1].trim():'';
         }
     });
-    var cookie = new Cookie(name,value);
+    const cookie = new Cookie(name, value);
     cookie.properties = properties;
     return cookie;
 };
@@ -63,8 +64,8 @@ Cookie.prototype.setSecure = function (secure) {
     this.properties.secure = secure?'HttpOnly':'';
 };
 Cookie.prototype.toString = function () {
-    var properties = this.properties;
-    var cookieDesc = [];
+    const properties = this.properties;
+    const cookieDesc = [];
     cookieDesc.push(this.name + '=' + this.value);
     for(let p in properties){
         if(!properties.hasOwnProperty(p) || !properties[p]){

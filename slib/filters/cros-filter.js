@@ -1,6 +1,6 @@
 function configCROS(chain, request, response) {
     request.headers['origin'] && response.setHeader('Access-Control-Allow-Origin', request.headers['origin']);
-    var headers = [
+    const headers = [
         {
             name: 'access-control-allow-method',
             request: 'access-control-request-method',
@@ -17,7 +17,7 @@ function configCROS(chain, request, response) {
         }
     ];
     headers.forEach(function (header) {
-        var _header = request.headers[header.request];
+        const _header = request.headers[header.request];
         if (_header) {
             response.setHeader(header.name, _header);
         }

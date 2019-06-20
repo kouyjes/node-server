@@ -1,7 +1,7 @@
 const proxyUtil = require('./proxyUtil');
 function proxy(chain,request){
 
-    var proxy = proxyUtil.matchProxy(request);
+    const proxy = proxyUtil.matchProxy(request);
 
     if(!proxy){
         chain.next();
@@ -9,10 +9,10 @@ function proxy(chain,request){
     }
 
     const config = request.getContextConfig();
-    var hostname = proxy.server;
-    var proxyPort = proxy.port;
+    const hostname = proxy.server;
+    const proxyPort = proxy.port;
 
-    var isSameProtocol = proxy.protocol === config.protocol,
+    const isSameProtocol = proxy.protocol === config.protocol,
         isSamePort = proxyPort === config.port;
     if(isSameProtocol && isSamePort && (['localhost','127.0.0.1'].indexOf(hostname) >= 0)){
         request.redirectUrl(proxy.url);

@@ -1,7 +1,7 @@
 function execute(chain,request,response){
 
     const config = request.getContextConfig();
-    var acceptEncoding;
+    let acceptEncoding;
     if(config.zipResponse){
         acceptEncoding = request.headers['accept-encoding'];
     }

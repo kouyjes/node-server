@@ -7,7 +7,7 @@ const Promise = require('promise');
 class FileSessionProvider extends SessionProvider{
     constructor(config){
         super(config);
-        var provider = config.session.provider;
+        const provider = config.session.provider;
         if(provider.dataFile){
             this.dataFile = provider.dataFile + config.port;
         }else{
@@ -23,11 +23,12 @@ class FileSessionProvider extends SessionProvider{
         this.initTimer(config);
     }
     initTimer(config){
-        var provider = this;
+        const provider = this;
         const timeout = config.session.timeout || 30;
-        var checkInterval = 1000*Math.max(timeout*60/10,10);
+        const checkInterval = 1000 * Math.max(timeout * 60 / 10, 10);
+
         function checkSession(){
-            var sessionCache = provider.sessionCache;
+            const sessionCache = provider.sessionCache;
             for(let attr in sessionCache){
                 if(!sessionCache.hasOwnProperty(attr)){
                     continue;
@@ -49,12 +50,12 @@ class FileSessionProvider extends SessionProvider{
      * @returns Session instance
      */
     getSession(sessionId,create){
-        var session = this.sessionCache[sessionId];
+        const session = this.sessionCache[sessionId];
         create = (create !== false);
         if(create && !session){
             return this.createSession(sessionId);
         }
-        var promise = new Promise(function (resolve) {
+        const promise = new Promise(function (resolve) {
             resolve(session);
         }.bind(this));
         return promise;
@@ -65,8 +66,8 @@ class FileSessionProvider extends SessionProvider{
      * @returns promise
      */
     createSession(sessionId){
-        var session = this.sessionCache[sessionId] = new Session(sessionId,this);
-        var promise = new Promise(function (resolve) {
+        const session = this.sessionCache[sessionId] = new Session(sessionId, this);
+        const promise = new Promise(function (resolve) {
             resolve(session);
         });
         this.persistRequest();
@@ -92,7 +93,7 @@ class FileSessionProvider extends SessionProvider{
             }));
         }.bind(this),waitSeconds * 1000 || 10000);
 
-        var promise = new Promise(function (resolve,reject) {
+        const promise = new Promise(function (resolve, reject) {
             resolve();
         });
         return promise;
@@ -108,7 +109,8 @@ class FileSessionProvider extends SessionProvider{
         }.bind(this));
     }
     dePersist(){
-        var content = null,dataFile = this.dataFile;
+        let content = null;
+        const dataFile = this.dataFile;
         if(fs.existsSync(dataFile)){
             content = fs.readFileSync(dataFile);
             content = Buffer.from(content).toString('utf-8');
@@ -116,11 +118,11 @@ class FileSessionProvider extends SessionProvider{
         return content;
     }
     recover(){
-        var content = this.dePersist();
+        const content = this.dePersist();
         if(!content){
             return;
         }
-        var result;
+        let result;
         try{
             result = JSON.parse(content);
         }catch (e){
@@ -129,7 +131,7 @@ class FileSessionProvider extends SessionProvider{
         if(!result){
             return;
         }
-        var sessionCache = this.sessionCache;
+        const sessionCache = this.sessionCache;
         for(let attr in result){
             if(!result.hasOwnProperty(attr)){
                 continue;

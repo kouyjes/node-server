@@ -2,11 +2,11 @@
 const Promise = require('promise'),
     fs = require('fs');
 function appendFileMeta(request,response,absPath){
-    var key = 'If-Modified-Since';
-    var lastMtime = request.headers[key] || request.headers[key.toLowerCase()];
+    const key = 'If-Modified-Since';
+    const lastMtime = request.headers[key] || request.headers[key.toLowerCase()];
     const promise = new Promise(function (resolve,reject) {
         fs.stat(absPath, function (err,stats) {
-            var flag_304 = false;
+            let flag_304 = false;
             if(err){
                 reject(flag_304);
                 return;
@@ -39,7 +39,7 @@ function process_304(chain,request,response){
         outputStaticResource = response.outputStaticResource;
 
     response.zipOutputStaticResource = function (absPath,acceptEncoding) {
-        var args = arguments;
+        const args = arguments;
         return appendFileMeta(request,response,absPath).then(function (flag_304) {
             if(flag_304){
                 output_304(response);
@@ -50,7 +50,7 @@ function process_304(chain,request,response){
     };
 
     response.outputStaticResource = function (absPath) {
-        var args = arguments;
+        const args = arguments;
         return appendFileMeta(request,response,absPath).then(function (flag_304) {
             if(flag_304){
                 output_304(response);

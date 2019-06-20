@@ -5,8 +5,8 @@ const providerPathMap = require('./impl.json');
 class SessionProvider{
     static getProvider(config){
 
-        var providerId = 'provider_' + config.port;
-        var provider = providers[providerId];
+        const providerId = 'provider_' + config.port;
+        let provider = providers[providerId];
         if(!provider){
             const sessionProvider = require(providerPathMap[config.session.provider.type || 'file']);
             provider = providers[providerId] = new sessionProvider(config);

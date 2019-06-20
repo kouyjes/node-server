@@ -2,7 +2,7 @@ const FS = require('fs'), PATH = require('path'), MIME = require('mime'), URL = 
 const zlib = require('zlib');
 function outputStaticResource(absPath) {
     const _ = this;
-    var mime = getMime(absPath);
+    const mime = getMime(absPath);
     _.setHeader('Content-Type', mime);
     FS.exists(absPath, function (exists) {
         if (exists) {
@@ -13,9 +13,9 @@ function outputStaticResource(absPath) {
     });
 }
 function zipOutputStaticResource(absPath, encoding) {
-    var _ = this;
-    var readerStream = FS.createReadStream(absPath);
-    var mime = getMime(absPath);
+    const _ = this;
+    const readerStream = FS.createReadStream(absPath);
+    const mime = getMime(absPath);
     _.setHeader('Content-Type', mime);
     if (encoding.match(/\bdeflate\b/)) {
         _.writeHead(200, {'Content-encoding': 'deflate'});
@@ -34,7 +34,7 @@ function zipOutputContent(mime, content, encoding) {
         'Content-Type': mime
     };
     const _ = this;
-    var output = content;
+    let output = content;
     _.setHeader('Content-Type', mime);
     if (encoding.match(/\bdeflate\b/)) {
         output = zlib.deflateSync(content);
@@ -52,7 +52,7 @@ function outputContent(mime, content) {
 }
 async function outputFile(pathname, acceptEncoding) {
     const _ = this;
-    var absPath = await _.findResourceByPathname(pathname);
+    const absPath = await _.findResourceByPathname(pathname);
     if (!absPath) {
         _.sendError(404, '404 error not found resource ');
         return;
@@ -82,7 +82,7 @@ function extendRequestResponse(request, response) {
     response.outputContent = outputContent;
     response.outputFile = outputFile;
 
-    var requestCache = {};
+    const requestCache = {};
     request.getAttribute = getAttribute(requestCache);
     request.setAttribute = setAttribute(requestCache);
 
@@ -93,7 +93,7 @@ function redirectUrl(url) {
     parseUrl(this);
 }
 function getMime(absPath) {
-    var mime = MIME.getType(PATH.basename(absPath));
+    let mime = MIME.getType(PATH.basename(absPath));
     if (!mime) {
         mime = 'text/html';
     }
@@ -101,7 +101,7 @@ function getMime(absPath) {
 }
 function parseUrl(request) {
     const urlInfo = URL.parse(request._url);
-    var pathname = PATH.normalize(urlInfo.pathname);
+    let pathname = PATH.normalize(urlInfo.pathname);
     pathname = pathname.replace(/\\/g,'/');
     request.pathname = pathname;
 
@@ -109,14 +109,14 @@ function parseUrl(request) {
         console.error('invalid request path :' + urlInfo.pathname);
     }
 
-    var queryParam = request.queryParam = {};
-    var query = urlInfo.query;
+    const queryParam = request.queryParam = {};
+    const query = urlInfo.query;
     query && query.split('&').forEach(function (querySection) {
-        var param = querySection.split('=');
+        const param = querySection.split('=');
         if (param.length < 2) {
             return;
         }
-        var paramObj = queryParam[param[0]];
+        const paramObj = queryParam[param[0]];
         if (paramObj) {
             queryParam[param[0]] = [paramObj].concat(param[1]);
         } else {

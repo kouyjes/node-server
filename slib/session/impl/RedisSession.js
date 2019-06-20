@@ -10,7 +10,7 @@ class RedisSession extends Session{
     }
     setAttribute(name,value){
         this.attributes[name] = value;
-        var property = {};
+        const property = {};
         property[name] = value;
         return this.provider.syncSession(this,property);
     }
@@ -30,9 +30,9 @@ class RedisSession extends Session{
         return this.attributes[name];
     }
     invalid(){
-        var promise = this.provider.invalidSession(this);
-        var attributes = this.attributes;
-        var keys = Object.keys(attributes);
+        const promise = this.provider.invalidSession(this);
+        const attributes = this.attributes;
+        const keys = Object.keys(attributes);
         keys.forEach(function (key) {
             delete attributes[key];
         });

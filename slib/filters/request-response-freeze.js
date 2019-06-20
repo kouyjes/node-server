@@ -8,14 +8,14 @@ const requestAttributes = [
 function freeze(chain, request, response) {
 
     requestAttributes.forEach(function (attr) {
-        var value = request[attr];
+        const value = request[attr];
         Object.defineProperty(request, attr, {
             value: value
         })
     });
 
     responseAttributes.forEach(function (attr) {
-        var value = response[attr];
+        const value = response[attr];
         Object.defineProperty(response, attr, {
             value: value
         })

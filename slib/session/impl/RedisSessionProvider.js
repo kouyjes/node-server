@@ -4,10 +4,10 @@ const Session =  require('./RedisSession');
 const logger = require('../../logger/server-logger').getAppLogger();
 const Promise = require('promise');
 function initRedisClient(config){
-    var redis = require("redis");
-    var provider = config.session.provider;
-    var option ={
-        host:provider.host
+    const redis = require("redis");
+    const provider = config.session.provider;
+    const option = {
+        host: provider.host
     };
     if(provider.port){
         option.port = provider.port;
@@ -15,7 +15,7 @@ function initRedisClient(config){
     if(provider.password){
         option.password = provider.password;
     }
-    var redisClient = redis.createClient(option);
+    const redisClient = redis.createClient(option);
     return redisClient;
 }
 class RedisSessionProvider extends SessionProvider{
@@ -34,36 +34,36 @@ class RedisSessionProvider extends SessionProvider{
      * @returns Session instance
      */
     getSession(sessionId,create){
-        var promise = new Promise(function (resolve,reject) {
-            var session = null;
-            try{
-                this.redisClient.hgetall(this._getSessionKey(sessionId), function (err,obj) {
-                    if(err){
+        const promise = new Promise(function (resolve, reject) {
+            let session = null;
+            try {
+                this.redisClient.hgetall(this._getSessionKey(sessionId), function (err, obj) {
+                    if (err) {
                         logger.error(err);
-                    }else if(obj){
-                        session = new Session(sessionId,this);
-                        for(let attr in obj){
-                            if(['id','provider'].indexOf(attr) >= 0){
+                    } else if (obj) {
+                        session = new Session(sessionId, this);
+                        for (let attr in obj) {
+                            if (['id', 'provider'].indexOf(attr) >= 0) {
                                 continue;
                             }
                             session.attributes[attr] = obj[attr];
                         }
                     }
-                    if(!session && create === true){
+                    if (!session && create === true) {
                         return this.createSession(sessionId);
                     }
                     resolve(session);
                 }.bind(this));
-            }catch (e){
+            } catch (e) {
                 logger.error(e);
             }
         }.bind(this));
         return promise;
     }
     getAttribute(sessionId,key){
-        var promise = new Promise(function (resolve,reject) {
-            this.redisClient.hget(this._getSessionKey(sessionId),key, function (err,value) {
-                if(err){
+        const promise = new Promise(function (resolve, reject) {
+            this.redisClient.hget(this._getSessionKey(sessionId), key, function (err, value) {
+                if (err) {
                     logger.error(err);
                     reject(err);
                     return;
@@ -82,17 +82,17 @@ class RedisSessionProvider extends SessionProvider{
      * @returns promise
      */
     createSession(sessionId){
-        var session = new Session(sessionId,this);
-        var promise = this._syncString(this._getSessionKey(sessionId),'id',session.getId()).then(function () {
+        const session = new Session(sessionId, this);
+        const promise = this._syncString(this._getSessionKey(sessionId), 'id', session.getId()).then(function () {
             return session;
         });
         this.expireSession(sessionId);
         return promise;
     }
     _syncString(hid,key,value){
-        var promise = new Promise(function (resolve,reject) {
-            this.redisClient.hset(hid,key,value, function (err) {
-                if(err){
+        const promise = new Promise(function (resolve, reject) {
+            this.redisClient.hset(hid, key, value, function (err) {
+                if (err) {
                     logger.error(err);
                     reject(err);
                     return;
@@ -101,20 +101,20 @@ class RedisSessionProvider extends SessionProvider{
                 resolve();
             });
         }.bind(this));
-       return promise;
+        return promise;
     }
     _syncProperty(sessionId,properties){
-        var hsetArgs = [this._getSessionKey(sessionId)];
+        const hsetArgs = [this._getSessionKey(sessionId)];
         Object.keys(properties).forEach(function (key) {
-            var value = properties[key];
+            let value = properties[key];
             if(!value){
                 value = '';
             }
             hsetArgs.push(key,value);
         }.bind(this));
-        var promsie = new Promise(function (resolve,reject) {
+        const promsie = new Promise(function (resolve, reject) {
             this.redisClient.hmset(hsetArgs, function (err) {
-                if(err){
+                if (err) {
                     logger.error(err);
                     reject(err);
                     return;
@@ -128,15 +128,15 @@ class RedisSessionProvider extends SessionProvider{
        return this._syncProperty(session.getId(),properties);
     }
     invalidSession(session){
-        var delArgs = Object.keys(session.attributes);
-        var promise = new Promise(function (resolve) {
-            if(delArgs.length === 0){
+        const delArgs = Object.keys(session.attributes);
+        const promise = new Promise(function (resolve) {
+            if (delArgs.length === 0) {
                 resolve();
                 return;
             }
-            this.redisClient.hdel(this._getSessionKey(session.getId()),delArgs, function (err) {
+            this.redisClient.hdel(this._getSessionKey(session.getId()), delArgs, function (err) {
                 resolve();
-                if(err){
+                if (err) {
                     logger.error(err);
                     reject(err);
                 }

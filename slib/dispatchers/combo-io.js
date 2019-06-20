@@ -13,7 +13,7 @@ function resolve(dir,name) {
 }
 function outputFileStream(stream,file) {
     return new Promise(function (resolve) {
-        var readerStream = fs.createReadStream(file);
+        const readerStream = fs.createReadStream(file);
         readerStream.on('end',function () {
             resolve();
         });
@@ -27,7 +27,7 @@ function outputFileStream(stream,file) {
 }
 async function outputStaticFiles(files) {
     const _ = this;
-    var mime = this.getMime(files[0]);
+    const mime = this.getMime(files[0]);
     _.setHeader('Content-Type', mime);
     for(let file of files){
         await outputFileStream(_,file);
@@ -35,10 +35,10 @@ async function outputStaticFiles(files) {
     _.end();
 }
 async function zipFiles(files, encoding) {
-    var _ = this;
-    var mime = this.getMime(files[0]);
+    const _ = this;
+    const mime = this.getMime(files[0]);
     _.setHeader('Content-Type', mime);
-    var zipStream = _;
+    let zipStream = _;
     if (encoding.match(/\bdeflate\b/)) {
         _.writeHead(200, {'Content-encoding': 'deflate'});
         zipStream = zlib.createDeflate();
@@ -60,30 +60,30 @@ const SPLIT = /\?{2,}/;
 function execute(chain,request,response) {
 
     const config = request.getContextConfig();
-    var url = request._url;
-    var match;
+    const url = request._url;
+    let match;
     if(!config.combo || !(match = url.match(SPLIT))){
         return chain.next();
     }
-    var acceptEncoding;
+    let acceptEncoding;
     if(config.zipResponse){
         acceptEncoding = request.headers['accept-encoding'];
     }
 
-    var index = match.index;
-    var dir = url.slice(0,index);
-    var comboStr = url.slice(index + match[0].length);
-    var pathnameArray = comboStr.split(',').map(function (resource) {
-        var pathname = resolve(dir,resource);
-        var urlInfo = URL.parse(pathname);
+    const index = match.index;
+    const dir = url.slice(0, index);
+    const comboStr = url.slice(index + match[0].length);
+    const pathnameArray = comboStr.split(',').map(function (resource) {
+        let pathname = resolve(dir, resource);
+        const urlInfo = URL.parse(pathname);
         pathname = path.normalize(urlInfo.pathname);
-        pathname = pathname.replace(/\\/g,'/');
+        pathname = pathname.replace(/\\/g, '/');
         return pathname;
     });
     response.findResourceByPathname(pathnameArray).then((resources) => {
-        var _404Resources = [];
+        const _404Resources = [];
         pathnameArray.forEach(function (p,index) {
-            var resource = resources[index];
+            const resource = resources[index];
             if(!resource){
                 _404Resources.push(resource);
             }
