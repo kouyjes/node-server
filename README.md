@@ -209,6 +209,7 @@ config = {
             //protocol:'https', // 【default http】
             //key:filePath.resolve('conf/private.pem'), //
             //cert:filePath.resolve('conf/file.crt'), //
+            //serverOption:【optional default null】服务器创建时其他选项参数
             //disabledAgentCache:true, //禁用客户端缓存
             docBase:[  //服务器工作目录
                 {dir:'/'},//{dir:'目录名称',controllers:'controllers',filters:'filters',path:'/'}

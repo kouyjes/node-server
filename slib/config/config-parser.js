@@ -8,6 +8,7 @@ function ServerContext(context){
         {name: 'protocol', value: 'http'},
         {name: 'key', value: null},
         {name: 'cert', value: null},
+        {name: 'serverOption', value: null},
         {name: 'zipResponse', value: false},
         {name: 'disabledAgentCache', value: false},
         {name: 'docBase', value: []},

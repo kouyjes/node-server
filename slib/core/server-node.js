@@ -104,10 +104,12 @@ function initHttps(config) {
     const port = config.port;
     const requestMapping = util.freeze(require(requestMappingPath)(config));
     checkKeyCert(config);
-    const option = {
+    let option = {
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert)
     };
+    let serverOpt = config.serverOption || {};
+    option = Object.assign(serverOpt,option);
     const server = https.createServer(option, function (req, resp) {
         let params = [req, resp, config, requestMapping];
         requestListener.apply(this, params);
@@ -119,11 +121,13 @@ function initHttp2(config){
     const port = config.port;
     const requestMapping = util.freeze(require(requestMappingPath)(config));
     checkKeyCert(config);
-    const option = {
+    let option = {
         key: fs.readFileSync(config.key),
         cert: fs.readFileSync(config.cert),
         allowHTTP1:true
     };
+    let serverOpt = config.serverOption || {};
+    option = Object.assign(serverOpt,option);
     const http2 = http2Getter();
     const server = http2['createSecureServer'](option, function (req, resp) {
         let params = [req, resp, config, requestMapping];

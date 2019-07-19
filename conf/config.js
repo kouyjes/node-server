@@ -1,7 +1,7 @@
 const path = require('path');
-var filePath = require('../file/file-path');
-var key = filePath.resolve('conf/private.pem');
-var cert = filePath.resolve('conf/file.crt');
+const filePath = require('../file/file-path');
+const key = filePath.resolve('conf/private.pem');
+const cert = filePath.resolve('conf/file.crt');
 const config = {
     debugMode:false,
     multiProcess:true,
@@ -17,6 +17,10 @@ const config = {
             protocol:'https',
             key:key,
             cert:cert,
+            serverOption:{
+                requestCert:true,
+                rejectUnauthorized:true
+            },
             docBase:[
                 {
                     path:'/',
